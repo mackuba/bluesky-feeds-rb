@@ -77,6 +77,8 @@ class FirehoseStream
 
     begin
       text = op.raw_record['text']
+
+      # tip: if you don't need full record data for debugging, delete the data column in posts
       post = Post.new(
         repo: op.repo,
         time: msg.time,
