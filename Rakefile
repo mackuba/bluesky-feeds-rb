@@ -23,6 +23,7 @@ def get_feed
   feed
 end
 
+desc "Print posts in the feed, starting from the newest ones (limit = N)"
 task :print_feed do
   feed = get_feed
   limit = ENV['N'] ? ENV['N'].to_i : 100
@@ -36,6 +37,7 @@ task :print_feed do
   end
 end
 
+desc "Rescan all posts and rebuild the feed from scratch"
 task :rebuild_feed do
   feed = get_feed
 
