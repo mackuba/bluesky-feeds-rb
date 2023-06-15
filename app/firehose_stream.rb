@@ -48,47 +48,63 @@ class FirehoseStream
     return if msg.type != :commit
 
     msg.operations.each do |op|
-      return unless op.type == :bsky_post
+      case op.type
+      when :bsky_post
+        process_post(msg, op)
 
-      if op.action == :delete
-        if post = Post.find_by(repo: op.repo, rkey: op.rkey)
-          post.destroy
-        end
+      when :bsky_like, :bsky_repost
+        # if you want to use the number of likes and/or reposts for filtering or sorting:
+        # add a likes/reposts column to feeds, then do +1 / -1 here depending on op.action
+
+      when :bsky_follow
+        # if you want to make a personalized feed that needs info about given user's follows/followers:
+        # add a followers table, then add/remove records here depending on op.action
+
+      else
+        # other types like :bsky_block, :bsky_profile (includes profile edits)
       end
-
-      return unless op.action == :create
-
-      begin
-        text = op.raw_record['text']
-        post = Post.new(
-          repo: op.repo,
-          time: msg.time,
-          text: text,
-          rkey: op.rkey,
-          data: JSON.generate(op.raw_record)
-        )
-
-        matched = false
-
-        @feeds.each do |feed|
-          if feed.post_matches?(post)
-            FeedPost.create!(feed_id: feed.feed_id, post: post, time: msg.time) unless !@save_posts
-            matched = true
-          end
-        end
-
-        if @log_posts == :all || @log_posts && matched
-          puts
-          puts text
-        end
-
-        post.save! if @save_posts == :all
-      rescue StandardError => e
-        puts "Error: #{e}"
-        p msg unless @env == :production || e.message == "nesting of 100 is too deep"
-      end
-
-      print '.' if @show_progress && @log_posts != :all
     end
+  end
+
+  def process_post(msg, op)
+    if op.action == :delete
+      if post = Post.find_by(repo: op.repo, rkey: op.rkey)
+        post.destroy
+      end
+    end
+
+    return unless op.action == :create
+
+    begin
+      text = op.raw_record['text']
+      post = Post.new(
+        repo: op.repo,
+        time: msg.time,
+        text: text,
+        rkey: op.rkey,
+        data: JSON.generate(op.raw_record)
+      )
+
+      matched = false
+
+      @feeds.each do |feed|
+        if feed.post_matches?(post)
+          FeedPost.create!(feed_id: feed.feed_id, post: post, time: msg.time) unless !@save_posts
+          matched = true
+        end
+      end
+
+      if @log_posts == :all || @log_posts && matched
+        puts
+        puts text
+      end
+
+      post.save! if @save_posts == :all
+    rescue StandardError => e
+      puts "Error: #{e}"
+      p msg unless @env == :production || e.message == "nesting of 100 is too deep"
+    end
+
+    print '.' if @show_progress && @log_posts != :all
   end
 end
