@@ -1,0 +1,11 @@
+development:
+  adapter: sqlite3
+  database: db/blueskydev.sqlite3
+  pool: 5
+  timeout: 10000
+
+production:
+  adapter: sqlite3
+  database: db/bluesky.sqlite3
+  pool: 5
+  timeout: 10000

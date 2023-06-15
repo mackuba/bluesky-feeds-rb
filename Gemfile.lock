@@ -1,0 +1,84 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (6.1.7.3)
+      activesupport (= 6.1.7.3)
+    activerecord (6.1.7.3)
+      activemodel (= 6.1.7.3)
+      activesupport (= 6.1.7.3)
+    activesupport (6.1.7.3)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+      zeitwerk (~> 2.3)
+    base32 (0.3.4)
+    blue_factory (0.1.2)
+      sinatra (~> 3.0)
+    capistrano (2.15.10)
+      highline
+      net-scp (>= 1.0.0)
+      net-sftp (>= 2.0.0)
+      net-ssh (>= 2.0.14)
+      net-ssh-gateway (>= 1.1.0)
+    cbor (0.5.9.6)
+    concurrent-ruby (1.2.2)
+    event_emitter (0.2.6)
+    highline (2.1.0)
+    i18n (1.14.1)
+      concurrent-ruby (~> 1.0)
+    minitest (5.18.0)
+    mustermann (3.0.0)
+      ruby2_keywords (~> 0.0.1)
+    net-scp (4.0.0)
+      net-ssh (>= 2.6.5, < 8.0.0)
+    net-sftp (4.0.0)
+      net-ssh (>= 5.0.0, < 8.0.0)
+    net-ssh (7.1.0)
+    net-ssh-gateway (2.0.0)
+      net-ssh (>= 4.0.0)
+    rack (2.2.7)
+    rack-protection (3.0.6)
+      rack
+    rake (13.0.6)
+    ruby2_keywords (0.0.5)
+    sinatra (3.0.6)
+      mustermann (~> 3.0)
+      rack (~> 2.2, >= 2.2.4)
+      rack-protection (= 3.0.6)
+      tilt (~> 2.0)
+    sinatra-activerecord (2.0.26)
+      activerecord (>= 4.1)
+      sinatra (>= 1.0)
+    skyfall (0.1.2)
+      base32 (~> 0.3, >= 0.3.4)
+      cbor (~> 0.5, >= 0.5.9.6)
+      websocket-client-simple (~> 0.6, >= 0.6.1)
+    sqlite3 (1.6.3-arm64-darwin)
+    sqlite3 (1.6.3-x86_64-linux)
+    tilt (2.2.0)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    webrick (1.8.1)
+    websocket (1.2.9)
+    websocket-client-simple (0.6.1)
+      event_emitter
+      websocket
+    zeitwerk (2.6.8)
+
+PLATFORMS
+  arm64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  activerecord (~> 6.0)
+  blue_factory (~> 0.1.2)
+  capistrano (~> 2.0)
+  rake
+  sinatra-activerecord (~> 2.0)
+  skyfall (~> 0.1.2)
+  sqlite3
+  webrick
+
+BUNDLED WITH
+   2.4.14
