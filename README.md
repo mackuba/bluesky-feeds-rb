@@ -8,6 +8,19 @@ This repo is an example or template that you can use to create a "feed generator
 **\#TODO** - please read the README of the official [feed-generator](https://github.com/bluesky-social/feed-generator) project.
 
 
+## Architecture of the app
+
+The project can be divided into three major parts:
+
+1. The "input" part, which subscribes to the firehose stream on the Bluesky server, reads and processes all incoming messages, and saves relevant posts and any other data to a local database.
+2. The "output" part, which makes the list of posts available as a feed server that implements the required "feed generator" endpoints.
+3. Everything else in the middle - the database, the models and feed classes.
+
+The first two parts were mostly abstracted away in the forms of two Ruby gems, namely [skyfall](https://github.com/mackuba/skyfall) for connecting to the firehose and [blue_factory](https://github.com/mackuba/blue_factory) for hosting the feed generator interface. The part in the middle is mostly up to you, since it depends greatly on what exactly you want to achieve (what kind of feed algorithms to implement, what data you need to keep, what database to use and so on) - but you can use this project as a good starting point.
+
+See the repositories of these two projects for more info on what they implement and how you can configure and use them.
+
+
 ## Setting up
 
 First, you need to set up the database. By default, the app is configured to use SQLite and to create database files in `db` directory. If you want to use e.g. MySQL or PostgreSQL, you need to add a different database adapter gem to the [`Gemfile`](https://github.com/mackuba/bluesky-feeds-rb/blob/master/Gemfile) and change the configuration in [`config/database.yml`](https://github.com/mackuba/bluesky-feeds-rb/blob/master/config/database.yml).
