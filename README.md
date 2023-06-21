@@ -59,9 +59,9 @@ curl -i http://localhost:3000/xrpc/app.bsky.feed.getFeedSkeleton?feed=at://did:p
 
 ### Running in production
 
-First, you need to make sure that the firehose script is always running and is restarted if necessary. One option to do this could be writing a `systemd` service config file and adding it to `/etc/systemd/system`.
+First, you need to make sure that the firehose script is always running and is restarted if necessary. One option to do this could be writing a `systemd` service config file and adding it to `/etc/systemd/system`. You can find an example service file in [`dist/bsky_feeds.service`](https://github.com/mackuba/bluesky-feeds-rb/blob/master/dist/bsky_feeds.service).
 
-To run the server part, you need an HTTP server and a Ruby app server. The choice is up to you and the configuration will depend on your selected config. My recommendation is Nginx with either Passenger (runs your app automatically from Nginx) or something like Puma (needs to be started by e.g. `systemd` like the firehose).
+To run the server part, you need an HTTP server and a Ruby app server. The choice is up to you and the configuration will depend on your selected config. My recommendation is Nginx with either Passenger (runs your app automatically from Nginx) or something like Puma (needs to be started by e.g. `systemd` like the firehose). You can find an example of Nginx configuration for Passenger in [`dist/feeds-nginx.conf`](https://github.com/mackuba/bluesky-feeds-rb/blob/master/dist/feeds-nginx.conf).
 
 
 ## Publishing the feed
