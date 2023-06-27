@@ -3,6 +3,8 @@
 require 'bundler/setup'
 require_relative 'app/firehose_stream'
 
+$stdout.sync = true
+
 ActiveRecord::Base.logger = nil
 
 def print_help
