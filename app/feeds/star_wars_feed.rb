@@ -2,7 +2,9 @@ require_relative 'feed'
 
 class StarWarsFeed < Feed
   REGEXPS = [
-    /star ?wars/i, /mandalorian/i, /\bandor\b/i, /\bjedi\b/i, /\bsith\b/i, /\byoda\b/i
+    /star ?wars/i, /mandalorian/i, /\bandor\b/i, /boba fett/i, /obi[ \-]?wan/i, /\bahsoka\b/, /\bjedi\b/i,
+    /\bsith\b/i, /\byoda\b/i, /Empire Strikes Back/, /chewbacca/i, /Han Solo/, /darth vader/i, /skywalker/i,
+    /lightsab(er|re)/i, /clone wars/i
   ]
 
   def feed_id

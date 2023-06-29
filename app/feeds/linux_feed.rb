@@ -1,6 +1,10 @@
 require_relative 'feed'
 
 class LinuxFeed < Feed
+  REGEXPS = [
+    /linux/i, /debian/i, /ubuntu/i, /\bKDE\b/, /\bGTK\d?\b/
+  ]
+
   def feed_id
     2
   end
@@ -18,6 +22,6 @@ class LinuxFeed < Feed
   end
 
   def post_matches?(post)
-    post.text =~ /linux/i
+    REGEXPS.any? { |r| post.text =~ r }
   end
 end
