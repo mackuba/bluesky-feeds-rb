@@ -3,6 +3,8 @@ Dir[File.join(__dir__, 'feeds', '*.rb')].each { |f| require(f) }
 require 'blue_factory'
 require 'sinatra/activerecord'
 
+ActiveRecord::Base.connection.execute "PRAGMA journal_mode = WAL"
+
 BlueFactory.set :publisher_did, 'did:plc:<your_identifier_here>'
 BlueFactory.set :hostname, 'feeds.example.com'
 
