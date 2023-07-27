@@ -62,4 +62,3 @@ ARGV.each do |arg|
 end
 
 firehose.start
-sleep
