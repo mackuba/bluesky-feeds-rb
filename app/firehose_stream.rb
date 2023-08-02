@@ -37,10 +37,13 @@ class FirehoseStream
 
     if @log_status
       @sky.on_connecting { |u| puts "Connecting to #{u}..." }
-      @sky.on_connect { @replaying = !!(cursor); puts "Connected #{Time.now} ✓" }
+      @sky.on_connect {
+        @replaying = !!(cursor)
+        puts "Connected #{Time.now} ✓"
+      }
       @sky.on_disconnect { puts; puts "Disconnected #{Time.now}" }
-      @sky.on_reconnect { puts "Reconnecting..." }
-      @sky.on_error { |e| puts "ERROR: #{Time.now} #{e}" }
+      @sky.on_reconnect { puts "Connection lost, reconnecting..." }
+      @sky.on_error { |e| puts "ERROR: #{Time.now} #{e.class} #{e.message}" }
     end
 
     @sky.connect
