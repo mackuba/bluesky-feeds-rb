@@ -113,7 +113,8 @@ class FirehoseStream
         time: msg.time,
         text: text,
         rkey: op.rkey,
-        data: JSON.generate(op.raw_record)
+        data: JSON.generate(op.raw_record),
+        record: op.raw_record
       )
 
       matched = false
