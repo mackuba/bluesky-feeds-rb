@@ -32,6 +32,9 @@ task :print_feed do
 
   Rainbow.enabled = true
 
+  # this fixes an error when piping a long output to less and then closing without reading it all
+  Signal.trap("SIGPIPE", "SYSTEM_DEFAULT")
+
   posts.each do |s|
     puts Rainbow(s.time).bold + ' * ' + Rainbow("https://bsky.app/profile/#{s.repo}/post/#{s.rkey}").darkgray
     puts
