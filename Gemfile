@@ -7,6 +7,7 @@ gem 'activerecord', '~> 6.0'
 gem 'sinatra-activerecord', '~> 2.0'
 gem 'sqlite3'
 gem 'rake'
+gem 'rainbow'
 
 group :development do
   gem 'webrick'

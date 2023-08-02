@@ -30,9 +30,19 @@ task :print_feed do
 
   posts = FeedPost.where(feed_id: feed.feed_id).joins(:post).order('feed_posts.time DESC').limit(limit).map(&:post)
 
+  Rainbow.enabled = true
+
   posts.each do |s|
-    puts "#{s.time} * https://bsky.app/profile/#{s.repo}/post/#{s.rkey}"
-    puts s.text
+    puts Rainbow(s.time).bold + ' * ' + Rainbow("https://bsky.app/profile/#{s.repo}/post/#{s.rkey}").darkgray
+    puts
+    puts feed.colored_text(s.text)
+    if s.record['embed']
+      json = JSON.generate(s.record['embed'])
+      colored = feed.colored_text(json)
+      puts colored unless colored == json
+    end
+    puts
+    puts "---"
     puts
   end
 end

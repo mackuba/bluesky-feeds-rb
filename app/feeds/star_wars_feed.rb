@@ -26,4 +26,12 @@ class StarWarsFeed < Feed
   def post_matches?(post)
     REGEXPS.any? { |r| post.text =~ r }
   end
+
+  def colored_text(t)
+    text = t.dup
+
+    REGEXPS.each { |r| text.gsub!(r) { |s| Rainbow(s).green }}
+
+    text
+  end
 end

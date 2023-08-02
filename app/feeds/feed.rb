@@ -1,4 +1,5 @@
 require 'blue_factory/errors'
+require 'rainbow'
 require 'time'
 
 require_relative '../models/feed_post'
@@ -29,6 +30,11 @@ class Feed
   # (optional) path of the feed avatar file
   def avatar_file
     nil
+  end
+
+  # if the feed matches posts using keywords/regexps, highlight these keywords in the passed text
+  def colored_text(text)
+    text
   end
 
   def get_posts(params)
