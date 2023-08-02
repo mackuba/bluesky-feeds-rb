@@ -32,6 +32,11 @@ class Feed
     nil
   end
 
+  # (optional) says if posts should be added to the feed from the firehose
+  def is_updating?
+    true
+  end
+
   # if the feed matches posts using keywords/regexps, highlight these keywords in the passed text
   def colored_text(text)
     text

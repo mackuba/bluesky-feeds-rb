@@ -20,7 +20,7 @@ class FirehoseStream
     @save_posts = (@env == :development) ? :all : :matching
     @replay_events = (@env == :development) ? false : true
 
-    @feeds = BlueFactory.all_feeds
+    @feeds = BlueFactory.all_feeds.select(&:is_updating?)
   end
 
   def start
