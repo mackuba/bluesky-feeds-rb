@@ -37,17 +37,19 @@ task :print_feed do
   end
 end
 
-desc "Rescan all posts and rebuild the feed from scratch"
+desc "Rescan all posts and rebuild the feed from scratch (DAYS = number of days)"
 task :rebuild_feed do
   feed = get_feed
 
   puts "Cleaning up feed..."
   FeedPost.where(feed_id: feed.feed_id).delete_all
 
-  total = Post.count
+  days = ENV['DAYS'] ? ENV['DAYS'].to_i : 7
 
   puts "Loading posts..."
-  posts = Post.all.to_a
+  posts = Post.order('time, id').where("time > DATETIME('now', '-#{days} day')").to_a
+
+  total = posts.length
 
   posts.each_with_index do |post, i|
     print "Processing posts... [#{i + 1}/#{total}]\r"
