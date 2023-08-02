@@ -51,20 +51,24 @@ desc "Rescan all posts and rebuild the feed from scratch (DAYS = number of days)
 task :rebuild_feed do
   feed = get_feed
 
-  puts "Cleaning up feed..."
-  FeedPost.where(feed_id: feed.feed_id).delete_all
-
-  days = ENV['DAYS'] ? ENV['DAYS'].to_i : 7
-
-  posts = Post.order('time, id').where("time > DATETIME('now', '-#{days} day')")
-  total = posts.count
-
-  offset = 0
-  page = 100000
-
   ActiveRecord::Base.transaction do
+    if ENV['ONLY_EXISTING']
+      posts = FeedPost.where(feed_id: feed.feed_id).joins(:post).map(&:post)
+    else
+      days = ENV['DAYS'] ? ENV['DAYS'].to_i : 7
+      posts = Post.order('time, id').where("time > DATETIME('now', '-#{days} day')")
+    end
+
+    puts "Cleaning up feed..."
+    FeedPost.where(feed_id: feed.feed_id).delete_all
+
+    total = posts.count
+
+    offset = 0
+    page = 100000
+
     while offset < total
-      batch = posts.limit(page).offset(offset).to_a
+      batch = posts.is_a?(Array) ? posts[offset...(offset+page)] : posts.limit(page).offset(offset).to_a
 
       batch.each_with_index do |post, i|
         print "Processing posts... [#{offset + i + 1}/#{total}]\r"
