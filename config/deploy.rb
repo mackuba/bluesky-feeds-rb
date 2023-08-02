@@ -34,5 +34,7 @@ namespace :deploy do
 
   task :link_shared do
     run "ln -s #{shared_path}/bluesky.sqlite3 #{release_path}/db/bluesky.sqlite3"
+    run "ln -s #{shared_path}/bluesky.sqlite3-shm #{release_path}/db/bluesky.sqlite3-shm"
+    run "ln -s #{shared_path}/bluesky.sqlite3-wal #{release_path}/db/bluesky.sqlite3-wal"
   end
 end
