@@ -69,4 +69,6 @@ ARGV.each do |arg|
   end
 end
 
+trap("SIGINT") { firehose.stop }
+
 firehose.start
