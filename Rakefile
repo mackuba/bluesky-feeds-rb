@@ -46,17 +46,26 @@ task :rebuild_feed do
 
   days = ENV['DAYS'] ? ENV['DAYS'].to_i : 7
 
-  puts "Loading posts..."
-  posts = Post.order('time, id').where("time > DATETIME('now', '-#{days} day')").to_a
+  posts = Post.order('time, id').where("time > DATETIME('now', '-#{days} day')")
+  total = posts.count
 
-  total = posts.length
+  offset = 0
+  page = 100000
 
-  posts.each_with_index do |post, i|
-    print "Processing posts... [#{i + 1}/#{total}]\r"
-    $stdout.flush
+  ActiveRecord::Base.transaction do
+    while offset < total
+      batch = posts.limit(page).offset(offset).to_a
 
-    if feed.post_matches?(post)
-      FeedPost.create!(feed_id: feed.feed_id, post: post, time: post.time)
+      batch.each_with_index do |post, i|
+        print "Processing posts... [#{offset + i + 1}/#{total}]\r"
+        $stdout.flush
+
+        if feed.post_matches?(post)
+          FeedPost.create!(feed_id: feed.feed_id, post: post, time: post.time)
+        end
+      end
+
+      offset += page
     end
   end
 
