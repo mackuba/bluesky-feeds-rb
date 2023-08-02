@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_15_155215) do
+ActiveRecord::Schema.define(version: 2023_07_27_134424) do
 
   create_table "feed_posts", force: :cascade do |t|
     t.integer "feed_id", null: false
@@ -26,6 +26,12 @@ ActiveRecord::Schema.define(version: 2023_06_15_155215) do
     t.text "data", null: false
     t.string "rkey", null: false
     t.index ["rkey"], name: "index_posts_on_rkey"
+  end
+
+  create_table "subscriptions", force: :cascade do |t|
+    t.string "service", null: false
+    t.integer "cursor", null: false
+    t.index ["service"], name: "index_subscriptions_on_service", unique: true
   end
 
 end

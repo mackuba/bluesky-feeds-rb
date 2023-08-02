@@ -5,17 +5,20 @@ require 'skyfall'
 require_relative 'config'
 require_relative 'models/feed_post'
 require_relative 'models/post'
+require_relative 'models/subscription'
 
 class FirehoseStream
-  attr_accessor :show_progress, :log_status, :log_posts, :save_posts
+  attr_accessor :show_progress, :log_status, :log_posts, :save_posts, :replay_events
 
   def initialize
     @env = (ENV['APP_ENV'] || ENV['RACK_ENV'] || :development).to_sym
+    @service = 'bsky.social'
 
     @show_progress = (@env == :development) ? true : false
     @log_status = true
     @log_posts = (@env == :development) ? :matching : false
     @save_posts = (@env == :development) ? :all : :matching
+    @replay_events = (@env == :development) ? false : true
 
     @feeds = BlueFactory.all_feeds
   end
@@ -23,14 +26,17 @@ class FirehoseStream
   def start
     return if @sky
 
-    @sky = Skyfall::Stream.new('bsky.social', :subscribe_repos)
+    last_cursor = load_or_init_cursor
+    cursor = @replay_events ? last_cursor : nil
+
+    @sky = Skyfall::Stream.new(@service, :subscribe_repos, cursor)
 
     @sky.on_message do |m|
       handle_message(m)
     end
 
     if @log_status
-      @sky.on_connect { puts "Connected #{Time.now} ✓" }
+      @sky.on_connect { @replaying = !!(cursor); puts "Connected #{Time.now} ✓" }
       @sky.on_disconnect { puts; puts "Disconnected #{Time.now}" }
       @sky.on_reconnect { puts "Reconnecting..." }
       @sky.on_error { |e| puts "ERROR: #{Time.now} #{e}" }
@@ -44,7 +50,29 @@ class FirehoseStream
     @sky = nil
   end
 
+  def load_or_init_cursor
+    if sub = Subscription.find_by(service: @service)
+      sub.cursor
+    else
+      Subscription.create!(service: @service, cursor: 0)
+      nil
+    end
+  end
+
+  def save_cursor(cursor)
+    Subscription.where(service: @service).update_all(cursor: cursor)
+  end
+
   def handle_message(msg)
+    if msg.seq % 10 == 0
+      save_cursor(msg.seq)
+    end
+
+    if @replaying
+      puts "Replaying events since #{msg.time.getlocal} -->"
+      @replaying = false
+    end
+
     return if msg.type != :commit
 
     msg.operations.each do |op|

@@ -27,6 +27,10 @@ def print_help
   puts "  -da = save all posts to database"
   puts "  -dm = save only matching posts to database"
   puts "  -nd = don't save any posts"
+  puts
+  puts "  * Replaying missed events: [default: -nr in development, -r in production]"
+  puts "  -r = pass a cursor param when connecting to replay any missed events"
+  puts "  -nr = don't replay missed events"
 end
 
 firehose = FirehoseStream.new
@@ -51,6 +55,10 @@ ARGV.each do |arg|
     firehose.save_posts = :all
   when '-nd'
     firehose.save_posts = false
+  when '-r'
+    firehose.replay_events = true
+  when '-nr'
+    firehose.replay_events = false
   when '-h', '--help'
     print_help
     exit 0
