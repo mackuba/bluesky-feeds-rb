@@ -62,8 +62,13 @@ task :rebuild_feed do
       posts = Post.order('time, id').where("time > DATETIME('now', '-#{days} day')")
     end
 
-    puts "Cleaning up feed..."
-    FeedPost.where(feed_id: feed.feed_id).delete_all
+    if ENV['APPEND_ONLY']
+      current_post_ids = FeedPost.where(feed_id: feed.feed_id).pluck('post_id')
+    else
+      puts "Cleaning up feed..."
+      FeedPost.where(feed_id: feed.feed_id).delete_all
+      current_post_ids = []
+    end
 
     total = posts.count
 
@@ -77,7 +82,7 @@ task :rebuild_feed do
         print "Processing posts... [#{offset + i + 1}/#{total}]\r"
         $stdout.flush
 
-        if feed.post_matches?(post)
+        if !current_post_ids.include?(post.id) && feed.post_matches?(post)
           FeedPost.create!(feed_id: feed.feed_id, post: post, time: post.time)
         end
       end
