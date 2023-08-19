@@ -13,7 +13,7 @@ GEM
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
     base32 (0.3.4)
-    blue_factory (0.1.3)
+    blue_factory (0.1.4)
       sinatra (~> 3.0)
     capistrano (2.15.11)
       highline
@@ -54,7 +54,7 @@ GEM
     sinatra-activerecord (2.0.26)
       activerecord (>= 4.1)
       sinatra (>= 1.0)
-    skyfall (0.2.0)
+    skyfall (0.2.1)
       base32 (~> 0.3, >= 0.3.4)
       cbor (~> 0.5, >= 0.5.9.6)
       faye-websocket (~> 0.11.2)
@@ -75,12 +75,12 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (~> 6.0)
-  blue_factory (~> 0.1, >= 0.1.3)
+  blue_factory (~> 0.1, >= 0.1.4)
   capistrano (~> 2.0)
   rainbow
   rake
   sinatra-activerecord (~> 2.0)
-  skyfall (~> 0.2)
+  skyfall (~> 0.2.1)
   sqlite3
   webrick
 
