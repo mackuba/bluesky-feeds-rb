@@ -68,8 +68,16 @@ class FirehoseStream
   end
 
   def handle_message(msg)
-    if msg.seq % 10 == 0
-      save_cursor(msg.seq)
+    if msg.is_a?(Skyfall::InfoMessage)
+      # AtProto error, the only one right now is "OutdatedCursor"
+      puts "InfoMessage: #{msg}"
+    elsif msg.is_a?(Skyfall::HandleMessage)
+      # use these events if you want to track handle changes:
+      # puts "Handle change: #{msg.repo} => #{msg.handle}"
+    elsif msg.is_a?(Skyfall::UnknownMessage)
+      puts "Unknown message type: #{msg.type}"
+    elsif msg.type != :commit
+      return
     end
 
     if @replaying
@@ -77,7 +85,9 @@ class FirehoseStream
       @replaying = false
     end
 
-    return if msg.type != :commit
+    if msg.seq % 10 == 0
+      save_cursor(msg.seq)
+    end
 
     msg.operations.each do |op|
       case op.type
