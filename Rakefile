@@ -36,7 +36,8 @@ task :print_feed do
   Signal.trap("SIGPIPE", "SYSTEM_DEFAULT")
 
   posts.each do |s|
-    puts Rainbow(s.time).bold + ' * ' + Rainbow("https://bsky.app/profile/#{s.repo}/post/#{s.rkey}").darkgray
+    print Rainbow(s.time).bold + ' * ' + Rainbow(s.id).bold + ' * '
+    puts Rainbow("https://bsky.app/profile/#{s.repo}/post/#{s.rkey}").darkgray
     puts
     puts feed.colored_text(s.text)
     if s.record['embed']
