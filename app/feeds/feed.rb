@@ -32,7 +32,7 @@ class Feed
     nil
   end
 
-  # (optional) says if posts should be added to the feed from the firehose
+  # (optional) should posts be added to the feed from the firehose?
   def is_updating?
     true
   end
@@ -59,6 +59,39 @@ class Feed
 
     { cursor: cursor, posts: posts.map { |p| 'at://' + p.repo + '/app.bsky.feed.post/' + p.rkey }}
   end
+
+  # Use this version of the method when enable_unsafe_auth is set to true in app/config.rb.
+  # This method is called with the DID of the user viewing the feed decoded from the auth header.
+  #
+  # Important: BlueFactory does not verify auth signatures of the JWT token at the moment,
+  # which means that anyone can easily spoof the DID in the header - do not use for anything critical!
+  #
+  # def get_posts(params, visitor_did)
+  #   # You can use this DID to e.g.:
+  #   # 1) Provide a personalized feed:
+  #
+  #   user = User.find_by(did: visitor_did)
+  #   raise BlueFactory::AuthorizationError unless user
+  #   build_feed_for_user(user)
+  #
+  #   # 2) Only allow whitelisted users to view the feed and show it as empty to others:
+  #   if visitor_did == BlueFactory.publisher_did || ALLOWED_USERS.include?(visitor_did)
+  #     get_feed_posts(params)
+  #   else
+  #     { posts: [] }
+  #   end
+  #
+  #   # 3) Ban some users from accessing the feed:
+  #   # (note: you can return a custom error message that will be shown in the error banner in the app)
+  #   if BANNED_USERS.include?(visitor_did)
+  #     raise BlueFactory::AuthorizationError, "You shall not pass!"
+  #   else
+  #     get_feed_posts(params)
+  #   end
+  #
+  #   # 4) Collect feed analytics (please take the privacy of your users into account)
+  #   Stats.count_visit(visitor_did)
+  # end
 
 
   private
