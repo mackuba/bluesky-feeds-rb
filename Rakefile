@@ -5,6 +5,7 @@ require 'sinatra/activerecord'
 require 'sinatra/activerecord/rake'
 
 require_relative 'app/config'
+require_relative 'app/utils'
 
 def get_feed
   if ENV['KEY'].to_s == ''
@@ -48,6 +49,36 @@ task :print_feed do
     puts
     puts "---"
     puts
+  end
+end
+
+desc "Remove a single post from a feed"
+task :delete_feed_item do
+  feed = get_feed
+
+  if ENV['URL'].to_s == ''
+    puts "Please specify post url as URL=https://bsky.app/..."
+    exit 1
+  end
+
+  url = ENV['URL']
+  parts = url.gsub(/^https:\/\//, '').split('/')
+  author = parts[2]
+  rkey = parts[4]
+
+  if author.start_with?('did:')
+    did = author
+    handle = Utils.handle_from_did(did)
+  else
+    handle = author
+    did = Utils.did_from_handle(handle)
+  end
+
+  if item = FeedPost.joins(:post).find_by(feed_id: feed.feed_id, post: { repo: did, rkey: rkey })
+    item.destroy
+    puts "Deleted post by @#{handle} from #{feed.display_name} feed"
+  else
+    puts "Post not found in the feed"
   end
 end
 
