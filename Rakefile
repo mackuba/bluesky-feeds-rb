@@ -76,6 +76,7 @@ desc "Rescan all posts and rebuild the feed from scratch (DAYS = number of days)
 task :rebuild_feed do
   feed = get_feed
   method = ENV['UNSAFE'] ? :tap : :transaction
+  dry = ENV['DRY_RUN'] ? true : false
 
   ActiveRecord::Base.send(method) do
     if ENV['ONLY_EXISTING']
@@ -88,25 +89,33 @@ task :rebuild_feed do
 
       feed_posts.each do |fp|
         if !feed.post_matches?(fp.post)
-          puts "Deleting from feed: ##{fp.post.id} \"#{fp.post.text}\""
-          fp.destroy
+          if dry
+            puts "Post would be deleted: ##{fp.post.id} \"#{fp.post.text}\""
+          else
+            puts "Deleting from feed: ##{fp.post.id} \"#{fp.post.text}\""
+            fp.destroy
+          end
           deleted += 1
         end
       end
 
-      puts "Done (#{deleted} post(s) deleted)."
+      if dry
+        puts "#{deleted} post(s) would be deleted."
+      else
+        puts "Done (#{deleted} post(s) deleted)."
+      end
     else
       days = ENV['DAYS'] ? ENV['DAYS'].to_i : 7
 
       posts = Post.order('time, id')
-      start = posts.where("time <= DATETIME('now', '-#{days} day')").last
+      start = posts.where("time <= DATETIME('now', '-#{days} days')").last
       stop = posts.last
       first = posts.first
       total = start ? (stop.id - start.id + 1) : (stop.id - first.id + 1)
 
       if ENV['APPEND_ONLY']
         current_post_ids = FeedPost.where(feed_id: feed.feed_id).pluck('post_id')
-      else
+      elsif !dry
         print "This will erase and replace the contents of the feed. Continue? [y/n]: "
         answer = STDIN.readline
         exit unless answer.strip.downcase == 'y'
@@ -118,6 +127,7 @@ task :rebuild_feed do
 
       offset = 0
       page = 100000
+      matched_posts = []
 
       loop do
         batch = if start
@@ -129,11 +139,15 @@ task :rebuild_feed do
         break if batch.empty?
 
         batch.each_with_index do |post, i|
-          print "Processing posts... [#{offset + i + 1}/#{total}]\r"
-          $stdout.flush
+          $stderr.print "Processing posts... [#{offset + i + 1}/#{total}]\r"
+          $stderr.flush
 
           if !current_post_ids.include?(post.id) && feed.post_matches?(post)
-            FeedPost.create!(feed_id: feed.feed_id, post: post, time: post.time)
+            if dry
+              matched_posts << post
+            else
+              FeedPost.create!(feed_id: feed.feed_id, post: post, time: post.time)
+            end
           end
         end
 
@@ -141,7 +155,21 @@ task :rebuild_feed do
         start = batch.last
       end
 
-      puts "Processing posts... Done." + " " * 30
+      $stderr.puts "Processing posts... Done." + " " * 30
+
+      if dry
+        if ENV['APPEND_ONLY']
+          puts "Added posts:"
+          puts "=============================="
+          puts
+        end
+
+        Signal.trap("SIGPIPE", "SYSTEM_DEFAULT")
+        printer = PostConsolePrinter.new(feed)
+        matched_posts.each do |p|
+          printer.display(p)
+        end
+      end
     end
   end
 end
