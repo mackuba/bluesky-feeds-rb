@@ -22,5 +22,33 @@ module Server
     # get '/' do
     #   erb :index
     # end
+
+    get '/' do
+      content_type 'text/html'
+
+      html = %(
+        <style>
+          body { width: 960px; margin: 40px auto; } li { margin: 5px 0px; }
+          a { text-decoration: none; color: #00e; } a:hover { text-decoration: underline; } a:visited { color: #00e; }
+        </style>
+        <h2>Bluesky Feed Server at #{request.host}</h2>
+        <p>This is an AT Protocol XRPC service hosting a Bluesky custom feed generator.</p>
+        <p>Available feeds:</p>
+        <ul>
+      )
+
+      BlueFactory.feed_keys.each do |k|
+        feed = BlueFactory.get_feed(k)
+        title = feed.display_name
+        html << %(<li><a href="https://bsky.app/profile/#{BlueFactory.publisher_did}/feed/#{k}">#{title}</a></li>\n)
+      end
+
+      html << %(
+        </ul>
+        <p>Powered by Ruby and <a href="https://github.com/mackuba/blue_factory">BlueFactory</a>.</p>
+      )
+
+      html
+    end
   end
 end
