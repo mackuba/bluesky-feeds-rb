@@ -120,6 +120,15 @@ class FirehoseStream
     begin
       text = op.raw_record['text']
 
+      # ignore posts with past date from Twitter etc. imported using some kind of tool
+      begin
+        post_time = Time.parse(op.raw_record['createdAt'])
+        return if post_time < msg.time - 86400
+      rescue StandardError => e
+        puts "Skipping post with invalid timestamp: #{op.raw_record['createdAt'].inspect} (#{op.repo})"
+        return
+      end
+
       # to save space, delete redundant post text and type from the saved data JSON
       trimmed_record = op.raw_record.dup
       trimmed_record.delete('$type')
