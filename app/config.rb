@@ -8,6 +8,7 @@ ActiveRecord::Base.connection.execute "PRAGMA journal_mode = WAL"
 BlueFactory.set :publisher_did, 'did:plc:<your_identifier_here>'
 BlueFactory.set :hostname, 'feeds.example.com'
 
+BlueFactory.add_feed 'build', BuildInPublicFeed.new
 BlueFactory.add_feed 'linux', LinuxFeed.new
 BlueFactory.add_feed 'starwars', StarWarsFeed.new
 
