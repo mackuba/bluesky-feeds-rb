@@ -120,13 +120,19 @@ class FirehoseStream
     begin
       text = op.raw_record['text']
 
+      # to save space, delete redundant post text and type from the saved data JSON
+      trimmed_record = op.raw_record.dup
+      trimmed_record.delete('$type')
+      trimmed_record.delete('text')
+      trimmed_json = JSON.generate(trimmed_record)
+
       # tip: if you don't need full record data for debugging, delete the data column in posts
       post = Post.new(
         repo: op.repo,
         time: msg.time,
         text: text,
         rkey: op.rkey,
-        data: JSON.generate(op.raw_record),
+        data: trimmed_json,
         record: op.raw_record
       )
 
