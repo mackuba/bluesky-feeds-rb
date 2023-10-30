@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 
+$LOAD_PATH.unshift(File.expand_path('..', __dir__))
+
 require 'bundler/setup'
-require_relative 'app/firehose_stream'
+require 'app/firehose_stream'
 
 $stdout.sync = true
 

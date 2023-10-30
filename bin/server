@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby
 
+$LOAD_PATH.unshift(File.expand_path('..', __dir__))
+
 require 'bundler/setup'
 
-require_relative 'app/config'
-require_relative 'app/server'
+require 'app/config'
+require 'app/server'
 
 Server.configure
 
