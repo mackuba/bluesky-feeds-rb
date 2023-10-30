@@ -19,4 +19,8 @@ class Post < ActiveRecord::Base
   def record
     @record ||= JSON.parse(data)
   end
+
+  def at_uri
+    "at://#{repo}/app.bsky.feed.post/#{rkey}"
+  end
 end
