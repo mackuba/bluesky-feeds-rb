@@ -16,7 +16,7 @@ class StarWarsFeed < Feed
   end
 
   def description
-    "Feed with posts about Star Wars"
+    "Feed with posts mentioning Star Wars movies and TV shows and various SW characters"
   end
 
   def avatar_file

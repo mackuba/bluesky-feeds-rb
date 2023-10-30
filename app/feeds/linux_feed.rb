@@ -29,7 +29,7 @@ class LinuxFeed < Feed
   end
 
   def description
-    "Feed with posts about Linux"
+    "All posts on Bluesky about Linux and its popular distributions & desktop environments"
   end
 
   def avatar_file
