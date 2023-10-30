@@ -117,58 +117,56 @@ class FirehoseStream
 
     return unless op.action == :create
 
+    # ignore posts with past date from Twitter etc. imported using some kind of tool
     begin
-      text = op.raw_record['text']
-
-      # ignore posts with past date from Twitter etc. imported using some kind of tool
-      begin
-        post_time = Time.parse(op.raw_record['createdAt'])
-        return if post_time < msg.time - 86400
-      rescue StandardError => e
-        puts "Skipping post with invalid timestamp: #{op.raw_record['createdAt'].inspect} (#{op.repo})"
-        return
-      end
-
-      # to save space, delete redundant post text and type from the saved data JSON
-      trimmed_record = op.raw_record.dup
-      trimmed_record.delete('$type')
-      trimmed_record.delete('text')
-      trimmed_json = JSON.generate(trimmed_record)
-
-      # tip: if you don't need full record data for debugging, delete the data column in posts
-      post = Post.new(
-        repo: op.repo,
-        time: msg.time,
-        text: text,
-        rkey: op.rkey,
-        data: trimmed_json,
-        record: op.raw_record
-      )
-
-      matched = false
-
-      @feeds.each do |feed|
-        if feed.post_matches?(post)
-          FeedPost.create!(feed_id: feed.feed_id, post: post, time: msg.time) unless !@save_posts
-          matched = true
-        end
-      end
-
-      if @log_posts == :all || @log_posts && matched
-        puts
-        puts text
-      end
-
-      post.save! if @save_posts == :all
+      post_time = Time.parse(op.raw_record['createdAt'])
+      return if post_time < msg.time - 86400
     rescue StandardError => e
-      puts "Error in #process_post: #{e}"
+      puts "Skipping post with invalid timestamp: #{op.raw_record['createdAt'].inspect} (#{op.repo})"
+      return
+    end
 
-      unless e.message == "nesting of 100 is too deep"
-        p msg
-        puts e.backtrace.reject { |x| x.include?('/ruby/') }
+    text = op.raw_record['text']
+
+    # to save space, delete redundant post text and type from the saved data JSON
+    trimmed_record = op.raw_record.dup
+    trimmed_record.delete('$type')
+    trimmed_record.delete('text')
+    trimmed_json = JSON.generate(trimmed_record)
+
+    # tip: if you don't need full record data for debugging, delete the data column in posts
+    post = Post.new(
+      repo: op.repo,
+      time: msg.time,
+      text: text,
+      rkey: op.rkey,
+      data: trimmed_json,
+      record: op.raw_record
+    )
+
+    matched = false
+
+    @feeds.each do |feed|
+      if feed.post_matches?(post)
+        FeedPost.create!(feed_id: feed.feed_id, post: post, time: msg.time) unless !@save_posts
+        matched = true
       end
     end
 
+    if @log_posts == :all || @log_posts && matched
+      puts
+      puts text
+    end
+
+    post.save! if @save_posts == :all
+
     print '.' if @show_progress && @log_posts != :all
+  rescue StandardError => e
+    puts "Error in #process_post: #{e}"
+
+    unless e.message == "nesting of 100 is too deep"
+      p msg
+      puts e.backtrace.reject { |x| x.include?('/ruby/') }
+    end
   end
 end
