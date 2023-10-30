@@ -161,8 +161,12 @@ class FirehoseStream
 
       post.save! if @save_posts == :all
     rescue StandardError => e
-      puts "Error: #{e}"
-      p msg unless @env == :production || e.message == "nesting of 100 is too deep"
+      puts "Error in #process_post: #{e}"
+
+      unless e.message == "nesting of 100 is too deep"
+        p msg
+        puts e.backtrace.reject { |x| x.include?('/ruby/') }
+      end
     end
 
     print '.' if @show_progress && @log_posts != :all
