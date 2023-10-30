@@ -10,6 +10,6 @@ gem 'rake'
 gem 'rainbow'
 
 group :development do
-  gem 'webrick'
+  gem 'thin'
   gem 'capistrano', '~> 2.0'
 end
