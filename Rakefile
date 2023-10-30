@@ -5,6 +5,7 @@ require 'sinatra/activerecord'
 require 'sinatra/activerecord/rake'
 
 require_relative 'app/config'
+require_relative 'app/post_console_printer'
 require_relative 'app/utils'
 
 def get_feed
@@ -31,24 +32,13 @@ task :print_feed do
 
   posts = FeedPost.where(feed_id: feed.feed_id).joins(:post).order('feed_posts.time DESC').limit(limit).map(&:post)
 
-  Rainbow.enabled = true
-
   # this fixes an error when piping a long output to less and then closing without reading it all
   Signal.trap("SIGPIPE", "SYSTEM_DEFAULT")
 
+  printer = PostConsolePrinter.new(feed)
+
   posts.each do |s|
-    print Rainbow(s.time).bold + ' * ' + Rainbow(s.id).bold + ' * '
-    puts Rainbow("https://bsky.app/profile/#{s.repo}/post/#{s.rkey}").darkgray
-    puts
-    puts feed.colored_text(s.text)
-    if s.record['embed']
-      json = JSON.generate(s.record['embed'])
-      colored = feed.colored_text(json)
-      puts colored unless colored == json
-    end
-    puts
-    puts "---"
-    puts
+    printer.display(s)
   end
 end
 
