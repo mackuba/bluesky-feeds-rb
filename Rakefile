@@ -57,21 +57,22 @@ task :rebuild_feed do
 
   ActiveRecord::Base.transaction do
     if ENV['ONLY_EXISTING']
-      posts = FeedPost.where(feed_id: feed.feed_id).joins(:post).map(&:post)
+      feed_posts = FeedPost.where(feed_id: feed.feed_id).includes(:post).to_a
+      total = feed_posts.length
 
-      puts "Cleaning up feed..."
-      FeedPost.where(feed_id: feed.feed_id).delete_all
+      puts "Processing posts..."
 
-      total = posts.count
+      deleted = 0
 
-      posts.each_with_index do |post, i|
-        print "Processing posts... [#{i + 1}/#{total}]\r"
-        $stdout.flush
-
-        if feed.post_matches?(post)
-          FeedPost.create!(feed_id: feed.feed_id, post: post, time: post.time)
+      feed_posts.each do |fp|
+        if !feed.post_matches?(fp.post)
+          puts "Deleting from feed: ##{fp.post.id} \"#{fp.post.text}\""
+          fp.destroy
+          deleted += 1
         end
       end
+
+      puts "Done (#{deleted} post(s) deleted)."
     else
       days = ENV['DAYS'] ? ENV['DAYS'].to_i : 7
       posts = Post.order('time DESC, id DESC').where("time > DATETIME('now', '-#{days} day')")
@@ -103,8 +104,8 @@ task :rebuild_feed do
 
         offset += page
       end
+
+      puts "Processing posts... Done." + " " * 30
     end
   end
-
-  puts "Processing posts... Done." + " " * 30
 end
