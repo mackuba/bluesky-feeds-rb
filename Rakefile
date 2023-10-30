@@ -54,8 +54,9 @@ end
 desc "Rescan all posts and rebuild the feed from scratch (DAYS = number of days)"
 task :rebuild_feed do
   feed = get_feed
+  method = ENV['UNSAFE'] ? :tap : :transaction
 
-  ActiveRecord::Base.transaction do
+  ActiveRecord::Base.send(method) do
     if ENV['ONLY_EXISTING']
       feed_posts = FeedPost.where(feed_id: feed.feed_id).includes(:post).to_a
       total = feed_posts.length
