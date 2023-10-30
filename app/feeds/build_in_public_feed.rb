@@ -1,5 +1,4 @@
 require_relative 'feed'
-require 'rainbow'
 
 class BuildInPublicFeed < Feed
   REGEXPS = [/\bbuild\s?in\s?public\b/i]
