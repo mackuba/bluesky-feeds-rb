@@ -75,7 +75,12 @@ task :rebuild_feed do
       puts "Done (#{deleted} post(s) deleted)."
     else
       days = ENV['DAYS'] ? ENV['DAYS'].to_i : 7
-      posts = Post.order('time DESC, id DESC').where("time > DATETIME('now', '-#{days} day')")
+
+      posts = Post.order('time, id')
+      start = posts.where("time <= DATETIME('now', '-#{days} day')").last
+      stop = posts.last
+      first = posts.first
+      total = start ? (stop.id - start.id + 1) : (stop.id - first.id + 1)
 
       if ENV['APPEND_ONLY']
         current_post_ids = FeedPost.where(feed_id: feed.feed_id).pluck('post_id')
@@ -89,13 +94,17 @@ task :rebuild_feed do
         current_post_ids = []
       end
 
-      total = posts.count
-
       offset = 0
       page = 100000
 
-      while offset < total
-        batch = posts.limit(page).offset(offset).to_a
+      loop do
+        batch = if start
+          posts.where("time > ? OR (time = ? AND id > ?)", start.time, start.time, start.id).limit(page).to_a
+        else
+          posts.limit(page).to_a
+        end
+
+        break if batch.empty?
 
         batch.each_with_index do |post, i|
           print "Processing posts... [#{offset + i + 1}/#{total}]\r"
@@ -107,6 +116,7 @@ task :rebuild_feed do
         end
 
         offset += page
+        start = batch.last
       end
 
       puts "Processing posts... Done." + " " * 30
