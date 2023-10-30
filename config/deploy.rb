@@ -12,6 +12,7 @@ set :use_sudo, false
 set :deploy_to, "/var/www/bsky_feeds"
 set :deploy_via, :remote_cache
 set :migrate_env, "RACK_ENV=production"
+set :public_children, []
 
 server "feeds.example.com", :app, :web, :db, :primary => true
 
