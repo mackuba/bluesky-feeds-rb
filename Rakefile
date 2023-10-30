@@ -80,6 +80,10 @@ task :rebuild_feed do
       if ENV['APPEND_ONLY']
         current_post_ids = FeedPost.where(feed_id: feed.feed_id).pluck('post_id')
       else
+        print "This will erase and replace the contents of the feed. Continue? [y/n]: "
+        answer = STDIN.readline
+        exit unless answer.strip.downcase == 'y'
+
         puts "Cleaning up feed..."
         FeedPost.where(feed_id: feed.feed_id).delete_all
         current_post_ids = []
