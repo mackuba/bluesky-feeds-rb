@@ -169,6 +169,10 @@ task :rebuild_feed do
         matched_posts.each do |p|
           printer.display(p)
         end
+
+        if ENV['TO_FILE']
+          File.write(ENV['TO_FILE'], matched_posts.map(&:id).to_json)
+        end
       end
     end
   end
