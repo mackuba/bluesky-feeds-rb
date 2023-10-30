@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=alf
 WorkingDirectory=/var/www/bsky_feeds/current
-ExecStart=/usr/bin/ruby firehose.rb
+ExecStart=/usr/bin/ruby bin/firehose
 Environment="RACK_ENV=production"
 TimeoutSec=15
 Restart=on-failure
