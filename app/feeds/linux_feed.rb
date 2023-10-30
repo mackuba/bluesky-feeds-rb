@@ -18,6 +18,7 @@ class LinuxFeed < Feed
     'did:plc:ppuqidjyabv5iwzeoxt4fq5o',  # GitHub Trending JS/TS
     'did:plc:eidn2o5kwuaqcss7zo7ivye5',  # GitHub Trending
     'did:plc:lontmsdex36tfjyxjlznnea7',  # RustTrending
+    'did:plc:myutg2pwkjbukv7pq2hp5mtl',  # CVE Alerts
   ]
 
   def feed_id
