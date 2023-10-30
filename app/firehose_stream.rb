@@ -12,7 +12,7 @@ class FirehoseStream
 
   def initialize
     @env = (ENV['APP_ENV'] || ENV['RACK_ENV'] || :development).to_sym
-    @service = 'bsky.social'
+    @service = 'bsky.network'
 
     @show_progress = (@env == :development) ? true : false
     @log_status = true
