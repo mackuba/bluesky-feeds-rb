@@ -58,37 +58,51 @@ task :rebuild_feed do
   ActiveRecord::Base.transaction do
     if ENV['ONLY_EXISTING']
       posts = FeedPost.where(feed_id: feed.feed_id).joins(:post).map(&:post)
-    else
-      days = ENV['DAYS'] ? ENV['DAYS'].to_i : 7
-      posts = Post.order('time, id').where("time > DATETIME('now', '-#{days} day')")
-    end
 
-    if ENV['APPEND_ONLY']
-      current_post_ids = FeedPost.where(feed_id: feed.feed_id).pluck('post_id')
-    else
       puts "Cleaning up feed..."
       FeedPost.where(feed_id: feed.feed_id).delete_all
-      current_post_ids = []
-    end
 
-    total = posts.count
+      total = posts.count
 
-    offset = 0
-    page = 100000
-
-    while offset < total
-      batch = posts.is_a?(Array) ? posts[offset...(offset+page)] : posts.limit(page).offset(offset).to_a
-
-      batch.each_with_index do |post, i|
-        print "Processing posts... [#{offset + i + 1}/#{total}]\r"
+      posts.each_with_index do |post, i|
+        print "Processing posts... [#{i + 1}/#{total}]\r"
         $stdout.flush
 
-        if !current_post_ids.include?(post.id) && feed.post_matches?(post)
+        if feed.post_matches?(post)
           FeedPost.create!(feed_id: feed.feed_id, post: post, time: post.time)
         end
       end
+    else
+      days = ENV['DAYS'] ? ENV['DAYS'].to_i : 7
+      posts = Post.order('time DESC, id DESC').where("time > DATETIME('now', '-#{days} day')")
 
-      offset += page
+      if ENV['APPEND_ONLY']
+        current_post_ids = FeedPost.where(feed_id: feed.feed_id).pluck('post_id')
+      else
+        puts "Cleaning up feed..."
+        FeedPost.where(feed_id: feed.feed_id).delete_all
+        current_post_ids = []
+      end
+
+      total = posts.count
+
+      offset = 0
+      page = 100000
+
+      while offset < total
+        batch = posts.limit(page).offset(offset).to_a
+
+        batch.each_with_index do |post, i|
+          print "Processing posts... [#{offset + i + 1}/#{total}]\r"
+          $stdout.flush
+
+          if !current_post_ids.include?(post.id) && feed.post_matches?(post)
+            FeedPost.create!(feed_id: feed.feed_id, post: post, time: post.time)
+          end
+        end
+
+        offset += page
+      end
     end
   end
 
