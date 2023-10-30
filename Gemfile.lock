@@ -54,7 +54,7 @@ GEM
     sinatra-activerecord (2.0.26)
       activerecord (>= 4.1)
       sinatra (>= 1.0)
-    skyfall (0.2.1)
+    skyfall (0.2.3)
       base32 (~> 0.3, >= 0.3.4)
       cbor (~> 0.5, >= 0.5.9.6)
       faye-websocket (~> 0.11.2)
@@ -80,9 +80,9 @@ DEPENDENCIES
   rainbow
   rake
   sinatra-activerecord (~> 2.0)
-  skyfall (~> 0.2.1)
+  skyfall (~> 0.2, >= 0.2.3)
   sqlite3
   webrick
 
 BUNDLED WITH
-   2.4.14
+   2.4.19
