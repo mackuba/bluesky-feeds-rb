@@ -76,9 +76,9 @@ class FirehoseStream
       # puts "Handle change: #{msg.repo} => #{msg.handle}"
     elsif msg.is_a?(Skyfall::UnknownMessage)
       puts "Unknown message type: #{msg.type}"
-    elsif msg.type != :commit
-      return
     end
+
+    return unless msg.type == :commit
 
     if @replaying
       puts "Replaying events since #{msg.time.getlocal} -->"
