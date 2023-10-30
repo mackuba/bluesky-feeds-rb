@@ -6,6 +6,10 @@ require 'app/models/post'
 require 'app/post_console_printer'
 require 'app/utils'
 
+require 'base64'
+require 'json'
+require 'open-uri'
+
 
 def get_feed
   if ENV['KEY'].to_s == ''
@@ -24,6 +28,14 @@ def get_feed
   feed
 end
 
+def make_jwt(payload)
+  header = { typ: 'JWT', alg: 'ES256K' }
+  sig = 'fakesig'
+
+  fields = [header, payload].map { |d| Base64.encode64(JSON.generate(d)).chomp } + [sig]
+  fields.join('.')
+end
+
 desc "Print posts in the feed, starting from the newest ones (limit = N)"
 task :print_feed do
   feed = get_feed
@@ -34,6 +46,35 @@ task :print_feed do
   # this fixes an error when piping a long output to less and then closing without reading it all
   Signal.trap("SIGPIPE", "SYSTEM_DEFAULT")
 
+  printer = PostConsolePrinter.new(feed)
+
+  posts.each do |s|
+    printer.display(s)
+  end
+end
+
+desc "Print feed by making an HTTP connection to the XRPC endpoint"
+task :test_feed do
+  feed = get_feed
+  limit = ENV['N'] ? ENV['N'].to_i : 100
+  actor = ENV['DID'] || BlueFactory.publisher_did
+  jwt = make_jwt({ iss: actor })
+
+  puts "Loading feed..."
+
+  feed_uri = "at://#{BlueFactory.publisher_did}/app.bsky.feed.generator/#{ENV['KEY']}"
+  port = ENV['PORT'] || BlueFactory::Server.settings.port
+  url = "http://localhost:#{port}/xrpc/app.bsky.feed.getFeedSkeleton?limit=#{limit}&feed=#{feed_uri}"
+  headers = { 'Authorization' => "Bearer #{jwt}" }
+
+  json = JSON.parse(URI.open(url, headers).read)
+  post_uris = json['feed'].map { |x| x['post'] }
+
+  puts "Loading posts..."
+
+  posts = post_uris.map { |uri| Post.find_by_at_uri(uri) }.compact
+
+  Signal.trap("SIGPIPE", "SYSTEM_DEFAULT")
   printer = PostConsolePrinter.new(feed)
 
   posts.each do |s|
