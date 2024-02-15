@@ -119,8 +119,13 @@ class FirehoseStream
 
     return unless op.action == :create
 
-    if op.raw_record.nil?
-      puts "Error: missing expected record data in operation: #{op.uri} (#{msg.seq})"
+    begin
+      if op.raw_record.nil?
+        puts "Error: missing expected record data in operation: #{op.uri} (#{msg.seq})"
+        return
+      end
+    rescue CBOR::UnpackError => e
+      puts "Error: couldn't decode record data for #{op.uri} (#{msg.seq}): #{e}"
       return
     end
 
