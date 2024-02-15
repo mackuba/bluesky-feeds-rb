@@ -31,7 +31,7 @@ class FirehoseStream
     last_cursor = load_or_init_cursor
     cursor = @replay_events ? last_cursor : nil
 
-    @sky = Skyfall::Stream.new(@service, :subscribe_repos, cursor)
+    @sky = sky = Skyfall::Stream.new(@service, :subscribe_repos, cursor)
 
     @sky.on_message do |m|
       handle_message(m)
@@ -43,7 +43,11 @@ class FirehoseStream
         @replaying = !!(cursor)
         puts "Connected #{Time.now} ✓"
       }
-      @sky.on_disconnect { puts; puts "Disconnected #{Time.now}" }
+      @sky.on_disconnect {
+        puts
+        puts "Disconnected #{Time.now}"
+        save_cursor(sky.cursor)
+      }
       @sky.on_reconnect { puts "Connection lost, reconnecting..." }
       @sky.on_error { |e| puts "ERROR: #{Time.now} #{e.class} #{e.message}" }
     end
