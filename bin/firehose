@@ -35,7 +35,7 @@ def print_help
   puts "  -nr = don't replay missed events"
 end
 
-firehose = FirehoseStream.new
+firehose = FirehoseStream.new(ENV['FIREHOSE'])
 
 ARGV.each do |arg|
   case arg

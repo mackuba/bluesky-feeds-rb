@@ -10,9 +10,11 @@ require_relative 'models/subscription'
 class FirehoseStream
   attr_accessor :show_progress, :log_status, :log_posts, :save_posts, :replay_events
 
-  def initialize
+  DEFAULT_RELAY = 'bsky.network'
+
+  def initialize(service = nil)
     @env = (ENV['APP_ENV'] || ENV['RACK_ENV'] || :development).to_sym
-    @service = 'bsky.network'
+    @service = service || DEFAULT_RELAY
 
     @show_progress = (@env == :development) ? true : false
     @log_status = true
