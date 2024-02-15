@@ -181,4 +181,10 @@ class FirehoseStream
       puts e.backtrace.reject { |x| x.include?('/ruby/') }
     end
   end
+
+  def inspect
+    vars = instance_variables - [:@feeds, :@timer]
+    values = vars.map { |v| "#{v}=#{instance_variable_get(v).inspect}" }.join(", ")
+    "#<#{self.class}:0x#{object_id} #{values}>"
+  end
 end
