@@ -9,6 +9,7 @@ require 'app/utils'
 require 'base64'
 require 'json'
 require 'open-uri'
+require 'set'
 
 
 def get_feed
@@ -169,7 +170,8 @@ def rebuild_feed(feed, days, append_only, dry = false)
   total = start ? (stop.id - start.id + 1) : (stop.id - first.id + 1)
 
   if append_only
-    current_post_ids = FeedPost.where(feed_id: feed.feed_id).pluck('post_id')
+    feed_posts = FeedPost.where(feed_id: feed.feed_id)
+    current_post_ids = Set.new(feed_posts.pluck('post_id'))
   elsif !dry
     print "This will erase and replace the contents of the feed. Continue? [y/n]: "
     answer = STDIN.readline
