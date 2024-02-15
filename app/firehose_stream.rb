@@ -77,7 +77,7 @@ class FirehoseStream
       # use these events if you want to track handle changes:
       # puts "Handle change: #{msg.repo} => #{msg.handle}"
     elsif msg.is_a?(Skyfall::UnknownMessage)
-      puts "Unknown message type: #{msg.type}"
+      puts "Unknown message type: #{msg.type} (#{msg.seq})"
     end
 
     return unless msg.type == :commit
@@ -120,7 +120,7 @@ class FirehoseStream
     return unless op.action == :create
 
     if op.raw_record.nil?
-      puts "Error: missing expected record data in operation: #{op.uri}"
+      puts "Error: missing expected record data in operation: #{op.uri} (#{msg.seq})"
       return
     end
 
@@ -129,7 +129,7 @@ class FirehoseStream
       post_time = Time.parse(op.raw_record['createdAt'])
       return if post_time < msg.time - 86400
     rescue StandardError => e
-      puts "Skipping post with invalid timestamp: #{op.raw_record['createdAt'].inspect} (#{op.repo})"
+      puts "Skipping post with invalid timestamp: #{op.raw_record['createdAt'].inspect} (#{op.repo}, #{msg.seq})"
       return
     end
 
