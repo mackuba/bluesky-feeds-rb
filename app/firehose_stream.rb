@@ -117,6 +117,11 @@ class FirehoseStream
 
     return unless op.action == :create
 
+    if op.raw_record.nil?
+      puts "Error: missing expected record data in operation: #{op.uri}"
+      return
+    end
+
     # ignore posts with past date from Twitter etc. imported using some kind of tool
     begin
       post_time = Time.parse(op.raw_record['createdAt'])
