@@ -71,6 +71,6 @@ ARGV.each do |arg|
   end
 end
 
-trap("SIGINT") { firehose.stop }
+trap("SIGINT") { puts "Stopping..."; firehose.stop }
 
 firehose.start
