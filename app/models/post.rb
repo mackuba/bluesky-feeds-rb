@@ -4,6 +4,10 @@ require 'json'
 class Post < ActiveRecord::Base
   validates_presence_of :repo, :time, :data, :rkey
   validates :text, length: { minimum: 0, allow_nil: false }
+  validates_length_of :repo, maximum: 60
+  validates_length_of :rkey, maximum: 16
+  validates_length_of :text, maximum: 1000
+  validates_length_of :data, maximum: 10000
 
   has_many :feed_posts, dependent: :destroy
 
