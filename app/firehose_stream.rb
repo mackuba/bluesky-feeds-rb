@@ -76,9 +76,11 @@ class FirehoseStream
     if msg.type == :info
       # AtProto error, the only one right now is "OutdatedCursor"
       log "InfoMessage: #{msg}"
-    elsif msg.type == :handle
+
+    elsif msg.type == :identity
       # use these events if you want to track handle changes:
       # log "Handle change: #{msg.repo} => #{msg.handle}"
+
     elsif msg.is_a?(Skyfall::Firehose::UnknownMessage)
       log "Unknown message type: #{msg.type} (#{msg.seq})"
     end
