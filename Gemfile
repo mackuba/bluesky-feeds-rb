@@ -15,3 +15,5 @@ group :development do
   gem 'thin'
   gem 'capistrano', '~> 2.0'
 end
+
+gem 'ostruct'  # for rake, to remove when rake is updated

@@ -64,6 +64,7 @@ GEM
     net-ssh (7.2.0)
     net-ssh-gateway (2.0.0)
       net-ssh (>= 4.0.0)
+    ostruct (0.6.1)
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
@@ -123,6 +124,7 @@ DEPENDENCIES
   capistrano (~> 2.0)
   debug
   irb
+  ostruct
   rainbow
   rake
   sinatra-activerecord (~> 2.0)
