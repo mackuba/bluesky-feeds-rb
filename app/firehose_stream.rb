@@ -33,20 +33,26 @@ class FirehoseStream
 
     @sky = sky = Skyfall::Firehose.new(@service, :subscribe_repos, cursor)
 
+    @sky.check_heartbeat = true
+
     @sky.on_message do |m|
       process_message(m)
     end
 
     if @log_status
       @sky.on_connecting { |u| log "Connecting to #{u}..." }
+
       @sky.on_connect {
         @replaying = !!(cursor)
         log "Connected ✓"
       }
+
       @sky.on_disconnect {
         log "Disconnected."
         save_cursor(sky.cursor)
       }
+
+      @sky.on_timeout { log "Trying to reconnect..." }
       @sky.on_reconnect { log "Connection lost, reconnecting..." }
       @sky.on_error { |e| log "ERROR: #{e.class} #{e.message}" }
     end
