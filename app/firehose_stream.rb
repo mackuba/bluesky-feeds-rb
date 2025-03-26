@@ -81,6 +81,10 @@ class FirehoseStream
       # use these events if you want to track handle changes:
       # log "Handle change: #{msg.repo} => #{msg.handle}"
 
+    elsif msg.type == :account
+      # tracking account status changes, e.g. suspensions, deactivations and deletes
+      process_account_message(msg)
+
     elsif msg.is_a?(Skyfall::Firehose::UnknownMessage)
       log "Unknown message type: #{msg.type} (#{msg.seq})"
     end
@@ -112,6 +116,14 @@ class FirehoseStream
       else
         # other types like :bsky_block, :bsky_profile (includes profile edits)
       end
+    end
+  end
+
+  def process_account_message(msg)
+    if msg.status == :deleted
+      # delete all data we have stored about this account
+      FeedPost.joins(:post).where(post: { repo: msg.did }).delete_all
+      Post.where(repo: msg.did).delete_all
     end
   end
 
