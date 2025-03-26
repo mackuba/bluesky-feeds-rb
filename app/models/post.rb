@@ -33,6 +33,36 @@ class Post < ActiveRecord::Base
     "at://#{repo}/app.bsky.feed.post/#{rkey}"
   end
 
+  def quoted_post_uri
+    if embed = record['embed']
+      if embed['$type'] == "app.bsky.embed.record"
+        return embed['record']['uri']
+      elsif embed['$type'] == "app.bsky.embed.recordWithMedia"
+        if embed['record']['$type'] == "app.bsky.embed.record"
+          return embed['record']['record']['uri']
+        end
+      end
+    end
+
+    return nil
+  end
+
+  def thread_root_uri
+    if root = (record['reply'] && record['reply']['root'])
+      root['uri']
+    else
+      nil
+    end
+  end
+
+  def parent_uri
+    if parent = (record['reply'] && record['reply']['parent'])
+      parent['uri']
+    else
+      nil
+    end
+  end
+
   def trim_too_long_data
     if embed = record['embed']
       if external = embed['external']
