@@ -6,4 +6,4 @@ development:
 production:
   adapter: sqlite3
   database: db/bluesky.sqlite3
-  timeout: 15000
+  timeout: 30000
