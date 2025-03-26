@@ -6,6 +6,8 @@ module Server
   end
 
   def run
+    register Sinatra::ActiveRecordExtension
+
     # do any additional config & customization on BlueFactory::Server here
     # see Sinatra docs for more info: https://sinatrarb.com/intro.html
     # e.g.:
