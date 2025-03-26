@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2023_08_02_222353) do
+ActiveRecord::Schema[8.0].define(version: 2024_06_04_130301) do
   create_table "feed_posts", force: :cascade do |t|
     t.integer "feed_id", null: false
     t.integer "post_id", null: false
@@ -24,6 +24,7 @@ ActiveRecord::Schema[8.0].define(version: 2023_08_02_222353) do
     t.string "text", null: false
     t.text "data", null: false
     t.string "rkey", null: false
+    t.index ["repo", "time"], name: "index_posts_on_repo_and_time"
     t.index ["rkey"], name: "index_posts_on_rkey"
     t.index ["time"], name: "index_posts_on_time"
   end
