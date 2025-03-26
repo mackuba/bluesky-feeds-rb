@@ -10,6 +10,8 @@ gem 'rake'
 gem 'rainbow'
 
 group :development do
+  gem 'irb'
+  gem 'debug'
   gem 'thin'
   gem 'capistrano', '~> 2.0'
 end
