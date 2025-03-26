@@ -10,18 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_02_222353) do
-
+ActiveRecord::Schema[8.0].define(version: 2023_08_02_222353) do
   create_table "feed_posts", force: :cascade do |t|
     t.integer "feed_id", null: false
     t.integer "post_id", null: false
-    t.datetime "time", null: false
+    t.datetime "time", precision: nil, null: false
     t.index ["feed_id", "time"], name: "index_feed_posts_on_feed_id_and_time"
   end
 
   create_table "posts", force: :cascade do |t|
     t.string "repo", null: false
-    t.datetime "time", null: false
+    t.datetime "time", precision: nil, null: false
     t.string "text", null: false
     t.text "data", null: false
     t.string "rkey", null: false
@@ -34,5 +33,4 @@ ActiveRecord::Schema.define(version: 2023_08_02_222353) do
     t.integer "cursor", null: false
     t.index ["service"], name: "index_subscriptions_on_service", unique: true
   end
-
 end
