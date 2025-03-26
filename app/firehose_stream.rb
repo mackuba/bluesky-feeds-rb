@@ -10,11 +10,11 @@ require_relative 'models/subscription'
 class FirehoseStream
   attr_accessor :show_progress, :log_status, :log_posts, :save_posts, :replay_events
 
-  DEFAULT_RELAY = 'bsky.network'
+  DEFAULT_JETSTREAM = 'jetstream2.us-east.bsky.network'
 
   def initialize(service = nil)
     @env = (ENV['APP_ENV'] || ENV['RACK_ENV'] || :development).to_sym
-    @service = service || DEFAULT_RELAY
+    @service = service || DEFAULT_JETSTREAM
 
     @show_progress = (@env == :development) ? true : false
     @log_status = true
@@ -31,7 +31,13 @@ class FirehoseStream
     last_cursor = load_or_init_cursor
     cursor = @replay_events ? last_cursor : nil
 
-    @sky = sky = Skyfall::Firehose.new(@service, :subscribe_repos, cursor)
+    @sky = sky = Skyfall::Jetstream.new(@service, {
+      cursor: cursor,
+
+      # we ask Jetstream to only send us post records, since we don't need anything else
+      # if you need to process e.g. likes or follows too, update or remove this param
+      wanted_collections: ['app.bsky.feed.post'],
+    })
 
     # set your user agent here to identify yourself on the relay
     # @sky.user_agent = "My Feed Server (@my.handle) #{@sky.version_string}"
