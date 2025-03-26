@@ -33,6 +33,9 @@ class FirehoseStream
 
     @sky = sky = Skyfall::Firehose.new(@service, :subscribe_repos, cursor)
 
+    # set your user agent here to identify yourself on the relay
+    # @sky.user_agent = "My Feed Server (@my.handle) #{@sky.version_string}"
+
     @sky.check_heartbeat = true
 
     @sky.on_message do |m|
