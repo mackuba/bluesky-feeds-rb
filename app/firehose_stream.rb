@@ -138,7 +138,7 @@ class FirehoseStream
 
   def process_post(msg, op)
     if op.action == :delete
-      if post = Post.find_by(repo: op.repo, rkey: op.rkey)
+      if post = Post.find_by_repo_rkey(op.repo, op.rkey)
         post.destroy
       end
     end
