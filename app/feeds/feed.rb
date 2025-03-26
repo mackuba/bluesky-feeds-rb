@@ -32,6 +32,11 @@ class Feed
     nil
   end
 
+  # (optional) special feed type (return :video for video feeds)
+  def content_mode
+    nil
+  end
+
   # (optional) should posts be added to the feed from the firehose?
   def is_updating?
     true
