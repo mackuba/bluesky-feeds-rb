@@ -77,12 +77,18 @@ end
 
 trap("SIGINT") {
   firehose.log "Stopping..."
-  firehose.stop
+
+  EM.add_timer(0) {
+    firehose.stop
+  }
 }
 
 trap("SIGTERM") {
   firehose.log "Shutting down the service..."
-  firehose.stop
+
+  EM.add_timer(0) {
+    firehose.stop
+  }
 }
 
 firehose.start
