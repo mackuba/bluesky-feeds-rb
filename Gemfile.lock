@@ -120,7 +120,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (~> 8.0)
-  blue_factory (~> 0.1, >= 0.1.4)
+  blue_factory (~> 0.1.5)
   capistrano (~> 2.0)
   debug
   irb
@@ -128,8 +128,8 @@ DEPENDENCIES
   rainbow
   rake
   sinatra-activerecord (~> 2.0)
-  skyfall (~> 0.2, >= 0.2.3)
-  sqlite3
+  skyfall (~> 0.5)
+  sqlite3 (~> 2.5)
   thin
 
 BUNDLED WITH
