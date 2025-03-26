@@ -38,18 +38,17 @@ class FirehoseStream
     end
 
     if @log_status
-      @sky.on_connecting { |u| puts "Connecting to #{u}..." }
+      @sky.on_connecting { |u| log "Connecting to #{u}..." }
       @sky.on_connect {
         @replaying = !!(cursor)
-        puts "Connected #{Time.now} ✓"
+        log "Connected ✓"
       }
       @sky.on_disconnect {
-        puts
-        puts "Disconnected #{Time.now}"
+        log "Disconnected."
         save_cursor(sky.cursor)
       }
-      @sky.on_reconnect { puts "Connection lost, reconnecting..." }
-      @sky.on_error { |e| puts "ERROR: #{Time.now} #{e.class} #{e.message}" }
+      @sky.on_reconnect { log "Connection lost, reconnecting..." }
+      @sky.on_error { |e| log "ERROR: #{e.class} #{e.message}" }
     end
 
     @sky.connect
@@ -76,18 +75,18 @@ class FirehoseStream
   def process_message(msg)
     if msg.is_a?(Skyfall::InfoMessage)
       # AtProto error, the only one right now is "OutdatedCursor"
-      puts "InfoMessage: #{msg}"
+      log "InfoMessage: #{msg}"
     elsif msg.is_a?(Skyfall::HandleMessage)
       # use these events if you want to track handle changes:
-      # puts "Handle change: #{msg.repo} => #{msg.handle}"
+      # log "Handle change: #{msg.repo} => #{msg.handle}"
     elsif msg.is_a?(Skyfall::UnknownMessage)
-      puts "Unknown message type: #{msg.type} (#{msg.seq})"
+      log "Unknown message type: #{msg.type} (#{msg.seq})"
     end
 
     return unless msg.type == :commit
 
     if @replaying
-      puts "Replaying events since #{msg.time.getlocal} -->"
+      log "Replaying events since #{msg.time.getlocal} -->"
       @replaying = false
     end
 
@@ -125,11 +124,11 @@ class FirehoseStream
 
     begin
       if op.raw_record.nil?
-        puts "Error: missing expected record data in operation: #{op.uri} (#{msg.seq})"
+        log "Error: missing expected record data in operation: #{op.uri} (#{msg.seq})"
         return
       end
     rescue CBOR::UnpackError => e
-      puts "Error: couldn't decode record data for #{op.uri} (#{msg.seq}): #{e}"
+      log "Error: couldn't decode record data for #{op.uri} (#{msg.seq}): #{e}"
       return
     end
 
@@ -138,7 +137,7 @@ class FirehoseStream
       post_time = Time.parse(op.raw_record['createdAt'])
       return if post_time < msg.time - 86400
     rescue StandardError => e
-      puts "Skipping post with invalid timestamp: #{op.raw_record['createdAt'].inspect} (#{op.repo}, #{msg.seq})"
+      log "Skipping post with invalid timestamp: #{op.raw_record['createdAt'].inspect} (#{op.repo}, #{msg.seq})"
       return
     end
 
@@ -178,12 +177,17 @@ class FirehoseStream
 
     print '.' if @show_progress && @log_posts != :all
   rescue StandardError => e
-    puts "Error in #process_post: #{e}"
+    log "Error in #process_post: #{e}"
 
     unless e.message == "nesting of 100 is too deep"
-      p msg
-      puts e.backtrace.reject { |x| x.include?('/ruby/') }
+      log msg.inspect
+      log e.backtrace.reject { |x| x.include?('/ruby/') }
     end
+  end
+
+  def log(text)
+    puts if @show_progress
+    puts "[#{Time.now}] #{text}"
   end
 
   def inspect
