@@ -8,7 +8,7 @@ require_relative 'models/post'
 require_relative 'models/subscription'
 
 class FirehoseStream
-  attr_accessor :show_progress, :log_status, :log_posts, :save_posts, :replay_events
+  attr_accessor :start_cursor, :show_progress, :log_status, :log_posts, :save_posts, :replay_events
 
   DEFAULT_JETSTREAM = 'jetstream2.us-east.bsky.network'
 
@@ -29,7 +29,7 @@ class FirehoseStream
     return if @sky
 
     last_cursor = load_or_init_cursor
-    cursor = @replay_events ? last_cursor : nil
+    cursor = @replay_events ? (@start_cursor || last_cursor) : nil
 
     @sky = sky = Skyfall::Jetstream.new(@service, {
       cursor: cursor,

@@ -33,6 +33,7 @@ def print_help
   puts "  * Replaying missed events: [default: -nr in development, -r in production]"
   puts "  -r = pass a cursor param when connecting to replay any missed events"
   puts "  -nr = don't replay missed events"
+  puts "  -r12345 = start from this specific cursor"
 end
 
 firehose = FirehoseStream.new(ENV['FIREHOSE'])
@@ -59,6 +60,9 @@ ARGV.each do |arg|
     firehose.save_posts = false
   when '-r'
     firehose.replay_events = true
+  when /^\-r(\d+)$/
+    firehose.replay_events = true
+    firehose.start_cursor = $1.to_i
   when '-nr'
     firehose.replay_events = false
   when '-h', '--help'
