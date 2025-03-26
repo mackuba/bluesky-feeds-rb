@@ -182,6 +182,11 @@ class FirehoseStream
       record: op.raw_record
     )
 
+    if !post.valid?
+      log "Error: post is invalid: #{op.uri} (#{msg.seq}): #{post.errors.to_a.join(', ')}"
+      return
+    end
+
     matched = false
 
     @feeds.each do |feed|
