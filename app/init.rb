@@ -20,4 +20,7 @@ else
   puts "-" * 112
 end
 
+ar_logger = ActiveRecord::Base.logger
+ActiveRecord::Base.logger = nil
 ActiveRecord::Base.connection.execute "PRAGMA journal_mode = WAL"
+ActiveRecord::Base.logger = ar_logger
