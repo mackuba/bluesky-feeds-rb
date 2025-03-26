@@ -31,7 +31,7 @@ class FirehoseStream
     last_cursor = load_or_init_cursor
     cursor = @replay_events ? last_cursor : nil
 
-    @sky = sky = Skyfall::Stream.new(@service, :subscribe_repos, cursor)
+    @sky = sky = Skyfall::Firehose.new(@service, :subscribe_repos, cursor)
 
     @sky.on_message do |m|
       process_message(m)
@@ -79,7 +79,7 @@ class FirehoseStream
     elsif msg.type == :handle
       # use these events if you want to track handle changes:
       # log "Handle change: #{msg.repo} => #{msg.handle}"
-    elsif msg.is_a?(Skyfall::UnknownMessage)
+    elsif msg.is_a?(Skyfall::Firehose::UnknownMessage)
       log "Unknown message type: #{msg.type} (#{msg.seq})"
     end
 
