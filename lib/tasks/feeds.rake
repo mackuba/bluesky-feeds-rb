@@ -196,7 +196,7 @@ def rebuild_feed(feed, days, append_only, dry = false)
     break if batch.empty?
 
     batch.each_with_index do |post, i|
-      $stderr.print "Processing posts... [#{offset + i + 1}/#{total}]\r"
+      $stderr.print "Processing posts... [#{offset + i + 1}/#{total}]\r" if i % 100 == 99
       $stderr.flush
 
       if !current_post_ids.include?(post.id) && feed.post_matches?(post)
