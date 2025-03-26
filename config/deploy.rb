@@ -7,7 +7,7 @@ set :bundle_without, []
 set :application, "bsky_feeds"
 set :repository, "git@github.com:mackuba/bluesky-feeds-rb.git"
 set :scm, :git
-set :keep_releases, 5
+set :keep_releases, 10
 set :use_sudo, false
 set :deploy_to, "/var/www/bsky_feeds"
 set :deploy_via, :remote_cache
