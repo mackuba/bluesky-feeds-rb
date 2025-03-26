@@ -34,7 +34,7 @@ class FirehoseStream
     @sky = sky = Skyfall::Stream.new(@service, :subscribe_repos, cursor)
 
     @sky.on_message do |m|
-      handle_message(m)
+      process_message(m)
     end
 
     if @log_status
@@ -73,7 +73,7 @@ class FirehoseStream
     Subscription.where(service: @service).update_all(cursor: cursor)
   end
 
-  def handle_message(msg)
+  def process_message(msg)
     if msg.is_a?(Skyfall::InfoMessage)
       # AtProto error, the only one right now is "OutdatedCursor"
       puts "InfoMessage: #{msg}"
