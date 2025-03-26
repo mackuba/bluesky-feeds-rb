@@ -189,8 +189,14 @@ class FirehoseStream
     )
 
     if !post.valid?
-      log "Error: post is invalid: #{op.uri} (#{msg.seq}): #{post.errors.to_a.join(', ')}"
-      return
+      if post.errors.has_key?(:data)
+        post.trim_too_long_data
+      end
+
+      if !post.valid?
+        log "Error: post is invalid: #{op.uri} (#{msg.seq}): #{post.errors.to_a.join(', ')}"
+        return
+      end
     end
 
     matched = false

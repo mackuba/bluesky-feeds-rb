@@ -32,4 +32,18 @@ class Post < ActiveRecord::Base
   def at_uri
     "at://#{repo}/app.bsky.feed.post/#{rkey}"
   end
+
+  def trim_too_long_data
+    if embed = record['embed']
+      if external = embed['external']
+        external['description'] = ''
+      end
+    end
+
+    if record['bridgyOriginalText']
+      record['bridgyOriginalText'] = ''
+    end
+
+    self.data = JSON.generate(record)
+  end
 end
