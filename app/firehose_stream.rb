@@ -60,7 +60,6 @@ class FirehoseStream
 
       @sky.on_disconnect {
         log "Disconnected."
-        save_cursor(sky.cursor)
       }
 
       @sky.on_timeout { log "Trying to reconnect..." }
@@ -73,6 +72,8 @@ class FirehoseStream
 
   def stop
     save_queued_posts
+    save_cursor(@sky.cursor) unless @sky.nil?
+
     @sky&.disconnect
     @sky = nil
   end
