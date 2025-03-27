@@ -11,6 +11,7 @@ class FirehoseStream
   attr_accessor :start_cursor, :show_progress, :log_status, :log_posts, :save_posts, :replay_events
 
   DEFAULT_JETSTREAM = 'jetstream2.us-east.bsky.network'
+  POSTS_BATCH_SIZE = 100
 
   def initialize(service = nil)
     @env = (ENV['APP_ENV'] || ENV['RACK_ENV'] || :development).to_sym
@@ -23,6 +24,7 @@ class FirehoseStream
     @replay_events = (@env == :development) ? false : true
 
     @feeds = BlueFactory.all_feeds.select(&:is_updating?)
+    @post_queue = []
   end
 
   def start
@@ -70,6 +72,7 @@ class FirehoseStream
   end
 
   def stop
+    save_queued_posts
     @sky&.disconnect
     @sky = nil
   end
@@ -203,7 +206,7 @@ class FirehoseStream
 
     @feeds.each do |feed|
       if feed.post_matches?(post)
-        FeedPost.create!(feed_id: feed.feed_id, post: post, time: msg.time) unless !@save_posts
+        post.feed_posts.build(feed_id: feed.feed_id, time: msg.time) unless !@save_posts
         matched = true
       end
     end
@@ -213,7 +216,14 @@ class FirehoseStream
       puts text
     end
 
-    post.save! if @save_posts == :all
+    if @save_posts == :all || @save_posts && matched
+      @post_queue << post
+    end
+
+    # wait until we have 100 posts and then save them all in one insert, if possible
+    if @post_queue.length >= POSTS_BATCH_SIZE
+      save_queued_posts
+    end
 
     print '.' if @show_progress && @log_posts != :all
   rescue StandardError => e
@@ -223,6 +233,52 @@ class FirehoseStream
       log msg.inspect
       log e.backtrace.reject { |x| x.include?('/ruby/') }
     end
+  end
+
+  def save_queued_posts
+    # we can only squash posts into one insert statement if they don't have nested feed_posts
+    # so we save those without feed_posts first:
+
+    matched, unmatched = @post_queue.partition { |x| x.feed_posts.length > 0 }
+
+    if unmatched.length > 0
+      values = unmatched.map { |p| p.attributes.except('id') }
+      Post.insert_all(values)
+    end
+
+    @post_queue = matched
+    return if @post_queue.empty?
+
+    # and for those that do have feed_posts, we save them normally, in one transaction:
+
+    ActiveRecord::Base.transaction do
+      @post_queue.each do |p|
+        # skip validations since we've checked the posts before adding them to the queue
+        p.save!(validate: false)
+      end
+    end
+
+    @post_queue = []
+  rescue StandardError => e
+    # there shouldn't be any ActiveRecord errors raised, but SQLite might find some issues which
+    # aren't covered by AR validations; so in that case, try to save any valid posts one by one:
+
+    @post_queue.each do |p|
+      begin
+        ActiveRecord::Base.transaction do
+          p.save!(validate: false)
+        end
+      rescue StandardError => e
+        log "Error in #save_queued_posts: #{e}"
+
+        unless e.message == "nesting of 100 is too deep"
+          log p.inspect
+          log e.backtrace.reject { |x| x.include?('/ruby/') }
+        end
+      end
+    end
+
+    @post_queue = []
   end
 
   def log(text)
