@@ -114,10 +114,6 @@ class FirehoseStream
       @replaying = false
     end
 
-    if msg.seq % 10 == 0
-      save_cursor(msg.seq)
-    end
-
     msg.operations.each do |op|
       case op.type
       when :bsky_post
@@ -223,6 +219,7 @@ class FirehoseStream
     # wait until we have 100 posts and then save them all in one insert, if possible
     if @post_queue.length >= POSTS_BATCH_SIZE
       save_queued_posts
+      save_cursor(@sky.cursor)
     end
 
     print '.' if @show_progress && @log_posts != :all
