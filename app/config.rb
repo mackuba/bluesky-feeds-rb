@@ -9,6 +9,6 @@ BlueFactory.set :hostname, 'feeds.example.com'
 # see Feed#get_posts(params, visitor_did) in app/feeds/feed.rb
 # BlueFactory.set :enable_unsafe_auth, true
 
-BlueFactory.add_feed 'build', BuildInPublicFeed.new
+BlueFactory.add_feed 'kit', KitFeed.new
 BlueFactory.add_feed 'linux', LinuxFeed.new
 BlueFactory.add_feed 'starwars', StarWarsFeed.new
