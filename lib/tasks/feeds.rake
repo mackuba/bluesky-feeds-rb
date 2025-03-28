@@ -136,29 +136,40 @@ task :rebuild_feed do
 end
 
 def rescan_feed_items(feed, dry = false)
-  feed_posts = FeedPost.where(feed_id: feed.feed_id).includes(:post).to_a
+  feed_posts = FeedPost.where(feed_id: feed.feed_id).includes(:post).order('time DESC').to_a
   total = feed_posts.length
 
   puts "Processing posts..."
 
-  deleted = 0
+  deleted = []
 
   feed_posts.each do |fp|
     if !feed.post_matches?(fp.post)
-      if dry
-        puts "Post would be deleted: ##{fp.post.id} \"#{fp.post.text}\""
-      else
+      if !dry
         puts "Deleting from feed: ##{fp.post.id} \"#{fp.post.text}\""
         fp.destroy
       end
-      deleted += 1
+
+      deleted << fp.post
     end
   end
 
   if dry
-    puts "#{deleted} post(s) would be deleted."
+    Signal.trap("SIGPIPE", "SYSTEM_DEFAULT")
+    printer = PostConsolePrinter.new(feed)
+
+    puts
+    puts Rainbow("Posts to delete:").red
+    puts Rainbow("==============================").red
+    puts
+
+    deleted.each do |p|
+      printer.display(p)
+    end
+
+    puts Rainbow("#{deleted.length} post(s) would be deleted.").red
   else
-    puts "Done (#{deleted} post(s) deleted)."
+    puts "Done (#{deleted.length} post(s) deleted)."
   end
 end
 
