@@ -178,12 +178,6 @@ def rescan_feed_items(feed, dry = false)
 end
 
 def rebuild_feed(feed, days, append_only, dry = false)
-  posts = Post.order('time, id')
-  start = posts.where("time <= DATETIME('now', '-#{days} days')").last
-  stop = posts.last
-  first = posts.first
-  total = start ? (stop.id - start.id + 1) : (stop.id - first.id + 1)
-
   if append_only
     feed_posts = FeedPost.where(feed_id: feed.feed_id)
     current_post_ids = Set.new(feed_posts.pluck('post_id'))
@@ -196,6 +190,11 @@ def rebuild_feed(feed, days, append_only, dry = false)
     FeedPost.where(feed_id: feed.feed_id).delete_all
     current_post_ids = []
   end
+
+  puts "Counting posts..."
+  posts = Post.order('time, id')
+  start = posts.where("time <= DATETIME('now', '-#{days} days')").last
+  total = start ? Post.where("time > DATETIME('now', '-#{days} days')").count : Post.count
 
   offset = 0
   page = 100000
