@@ -6,12 +6,15 @@ require_relative 'config'
 require_relative 'models/feed_post'
 require_relative 'models/post'
 require_relative 'models/subscription'
+require_relative 'utils'
 
 class FirehoseStream
   attr_accessor :start_cursor, :show_progress, :log_status, :log_posts, :save_posts, :replay_events
 
   DEFAULT_JETSTREAM = 'jetstream2.us-east.bsky.network'
   POSTS_BATCH_SIZE = 100
+
+  include Utils
 
   def initialize(service = nil)
     @env = (ENV['APP_ENV'] || ENV['RACK_ENV'] || :development).to_sym

@@ -1,17 +1,12 @@
-require 'json'
-require 'open-uri'
+require 'didkit'
 
 module Utils
   def handle_from_did(did)
-    url = "https://plc.directory/#{did}"
-    json = JSON.parse(URI.open(url).read)
-    json['alsoKnownAs'][0].gsub('at://', '')
+    DID.new(did).get_validated_handle
   end
 
   def did_from_handle(handle)
-    url = "https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=#{handle}"
-    json = JSON.parse(URI.open(url).read)
-    json['did']
+    DID.resolve_handle(handle).did
   end
 
   extend self

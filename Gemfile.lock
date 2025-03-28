@@ -40,6 +40,7 @@ GEM
     debug (1.10.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    didkit (0.2.3)
     drb (2.2.1)
     eventmachine (1.2.7)
     faye-websocket (0.11.3)
@@ -123,6 +124,7 @@ DEPENDENCIES
   blue_factory (~> 0.1.5)
   capistrano (~> 2.0)
   debug
+  didkit (~> 0.2)
   irb
   ostruct
   rainbow
