@@ -21,7 +21,9 @@ task :cleanup_posts do
     WHERE feed_posts.id IS NULL AND posts.time < DATETIME('now', '-#{days} days')
   }
 
+  time_start = Time.now
   result = Post.where("id IN (#{subquery})").delete_all
+  time_end = Time.now
 
-  puts "Deleted #{result} posts older than #{time_limit}"
+  puts "#{time_end}: Deleted #{result} posts older than #{time_limit} in #{(time_end - time_start)}s"
 end
