@@ -76,6 +76,7 @@ ARGV.each do |arg|
 end
 
 trap("SIGINT") {
+  puts
   firehose.log "Stopping..."
 
   EM.add_timer(0) {
