@@ -119,6 +119,10 @@ task :rebuild_feed do
   method = ENV['UNSAFE'] ? :tap : :transaction
   dry = !!ENV['DRY_RUN']
 
+  if ENV['ONLY_EXISTING'] && ENV['APPEND_ONLY']
+    raise "APPEND_ONLY cannot be used together with ONLY_EXISTING"
+  end
+
   ActiveRecord::Base.send(method) do
     if ENV['ONLY_EXISTING']
       rescan_feed_items(feed, dry)
@@ -211,11 +215,8 @@ def rebuild_feed(feed, days, append_only, dry = false)
       $stderr.flush
 
       if !current_post_ids.include?(post.id) && feed.post_matches?(post)
-        if dry
-          matched_posts << post
-        else
-          FeedPost.create!(feed_id: feed.feed_id, post: post, time: post.time)
-        end
+        matched_posts << post
+        FeedPost.create!(feed_id: feed.feed_id, post: post, time: post.time) unless dry
       end
     end
 
@@ -225,9 +226,9 @@ def rebuild_feed(feed, days, append_only, dry = false)
 
   $stderr.puts "Processing posts... Done." + " " * 30
 
-  if dry
+  if dry || ENV['VERBOSE']
     if append_only
-      puts "Added posts:"
+      puts (dry ? "Posts to add: " : "Added posts: ") + matched_posts.length.to_s
       puts "=============================="
       puts
     end
@@ -235,7 +236,7 @@ def rebuild_feed(feed, days, append_only, dry = false)
     Signal.trap("SIGPIPE", "SYSTEM_DEFAULT")
     printer = PostConsolePrinter.new(feed)
 
-    matched_posts.each do |p|
+    matched_posts.reverse.each do |p|
       printer.display(p)
     end
 
