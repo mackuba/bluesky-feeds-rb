@@ -13,6 +13,10 @@ class LinuxFeed < Feed
     /the linux of/i, /linux (bros|nerds)/i, /ubuntu tv/i
   ]
 
+  LINK_EXCLUDES = [
+    /\bamzn\.to\b/i, /\bwww\.amazon\.com\b/i, /\bmercadolivre\.com\b/i,
+  ]
+
   MUTED_PROFILES = [
     'did:plc:35c6qworuvguvwnpjwfq3b5p',  # Linux Kernel Releases
     'did:plc:ppuqidjyabv5iwzeoxt4fq5o',  # GitHub Trending JS/TS
@@ -40,13 +44,24 @@ class LinuxFeed < Feed
   def post_matches?(post)
     return false if MUTED_PROFILES.include?(post.repo)
 
-    REGEXPS.any? { |r| post.text =~ r } && !(EXCLUDE.any? { |r| post.text =~ r })
+    REGEXPS.any? { |r| post.text =~ r } && !(EXCLUDE.any? { |r| post.text =~ r }) && !has_forbidden_links?(post)
+  end
+
+  def has_forbidden_links?(post)
+    if embed = post.record['embed']
+      if link = (embed['external'] || embed['media'] && embed['media']['external'])
+        return true if LINK_EXCLUDES.any? { |r| r =~ link['uri'] }
+      end
+    end
+
+    return false
   end
 
   def colored_text(t)
     text = t.dup
 
     EXCLUDE.each { |r| text.gsub!(r) { |s| Rainbow(s).red }}
+    LINK_EXCLUDES.each { |r| text.gsub!(r) { |s| Rainbow(s).red }}
     REGEXPS.each { |r| text.gsub!(r) { |s| Rainbow(s).green }}
 
     text
