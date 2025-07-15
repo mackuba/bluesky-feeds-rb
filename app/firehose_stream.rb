@@ -125,7 +125,9 @@ class FirehoseStream
 
       when :bsky_like, :bsky_repost
         # if you want to use the number of likes and/or reposts for filtering or sorting:
-        # add a likes/reposts column to feeds, then do +1 / -1 here depending on op.action
+        # add a likes/reposts table, then add/remove records here depending on op.action
+        # (you'll need to track like records and not just have a single numeric "likes" field,
+        # because delete events only include the uri/rkey of the like, not of the liked post)
 
       when :bsky_follow
         # if you want to make a personalized feed that needs info about given user's follows/followers:
