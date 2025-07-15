@@ -65,8 +65,14 @@ class FirehoseStream
         log "Disconnected."
       }
 
-      @sky.on_timeout { log "Trying to reconnect..." }
-      @sky.on_reconnect { log "Connection lost, reconnecting..." }
+      @sky.on_reconnect {
+        log "Connection lost, reconnecting..."
+      }
+
+      @sky.on_timeout {
+        log "Trying to reconnect..."
+      }
+
       @sky.on_error { |e| log "ERROR: #{e.class} #{e.message}" }
     end
 
@@ -96,7 +102,7 @@ class FirehoseStream
 
   def process_message(msg)
     if msg.type == :info
-      # AtProto error, the only one right now is "OutdatedCursor"
+      # ATProto error, the only one right now is "OutdatedCursor"
       log "InfoMessage: #{msg}"
 
     elsif msg.type == :identity
@@ -107,7 +113,7 @@ class FirehoseStream
       # tracking account status changes, e.g. suspensions, deactivations and deletes
       process_account_message(msg)
 
-    elsif msg.is_a?(Skyfall::Firehose::UnknownMessage)
+    elsif msg.unknown?
       log "Unknown message type: #{msg.type} (#{msg.seq})"
     end
 

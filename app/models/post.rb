@@ -1,6 +1,8 @@
 require 'active_record'
 require 'json'
 
+require_relative 'feed_post'
+
 class Post < ActiveRecord::Base
   validates_presence_of :repo, :time, :data, :rkey
   validates :text, length: { minimum: 0, allow_nil: false }
