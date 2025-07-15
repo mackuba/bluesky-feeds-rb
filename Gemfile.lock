@@ -43,9 +43,9 @@ GEM
     didkit (0.2.3)
     drb (2.2.1)
     eventmachine (1.2.7)
-    faye-websocket (0.11.3)
+    faye-websocket (0.12.0)
       eventmachine (>= 0.12.0)
-      websocket-driver (>= 0.5.1)
+      websocket-driver (>= 0.8.0)
     highline (2.1.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
@@ -92,12 +92,12 @@ GEM
     sinatra-activerecord (2.0.28)
       activerecord (>= 4.1)
       sinatra (>= 1.0)
-    skyfall (0.5.0)
+    skyfall (0.6.0)
       base32 (~> 0.3, >= 0.3.4)
       base64 (~> 0.1)
       cbor (~> 0.5, >= 0.5.9.6)
       eventmachine (~> 1.2, >= 1.2.7)
-      faye-websocket (~> 0.11)
+      faye-websocket (~> 0.12)
     sqlite3 (2.6.0-arm64-darwin)
     sqlite3 (2.6.0-x86_64-linux-gnu)
     stringio (3.1.6)
@@ -110,7 +110,7 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uri (1.0.3)
-    websocket-driver (0.7.7)
+    websocket-driver (0.8.0)
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -130,7 +130,7 @@ DEPENDENCIES
   rainbow
   rake
   sinatra-activerecord (~> 2.0)
-  skyfall (~> 0.5)
+  skyfall (~> 0.6)
   sqlite3 (~> 2.5)
   thin
 
