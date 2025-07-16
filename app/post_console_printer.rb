@@ -14,8 +14,7 @@ class PostConsolePrinter
     if langs.nil?
       print '[nil] * '
     elsif langs != ['en']
-      label = langs.map { |ln| ln.upcase.tr('A-Z', "\u{1F1E6}-\u{1F1FF}") }.join
-      print "#{label}  * "
+      print "[#{langs.join(', ')}] * "
     end
 
     puts Rainbow("https://bsky.app/profile/#{post.repo}/post/#{post.rkey}").darkgray
