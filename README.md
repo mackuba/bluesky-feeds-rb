@@ -200,8 +200,6 @@ When you're ready, run the rake task passing the feed key (you will be asked for
 bundle exec rake bluesky:publish KEY=starwars
 ```
 
-If you're on a self-hosted PDS, pass the hostname in a parameter like this: `SERVER_URL=https://pds.example.com`.
-
 
 ### App maintenance
 
