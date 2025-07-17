@@ -7,7 +7,11 @@ require 'app/firehose_stream'
 
 $stdout.sync = true
 
-ActiveRecord::Base.logger = nil
+if ENV['ARLOG'] == '1'
+  ActiveRecord::Base.logger = Logger.new(STDOUT)
+else
+  ActiveRecord::Base.logger = nil
+end
 
 def print_help
   puts "Usage: #{$0} [options...]"
