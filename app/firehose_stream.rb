@@ -57,6 +57,7 @@ class FirehoseStream
       @sky.on_connecting { |u| log "Connecting to #{u}..." }
 
       @sky.on_connect {
+        @message_counter = 0
         @replaying = !!(cursor)
         log "Connected ✓"
       }
@@ -122,6 +123,13 @@ class FirehoseStream
     if @replaying
       log "Replaying events since #{msg.time.getlocal} -->"
       @replaying = false
+    end
+
+    @message_counter += 1
+
+    if @message_counter % 100 == 0
+      # save current cursor every 100 events
+      save_cursor(msg.seq)
     end
 
     msg.operations.each do |op|
@@ -224,14 +232,16 @@ class FirehoseStream
       puts text
     end
 
-    if @save_posts == :all || @save_posts && matched
+    if @save_posts == :all
+      # wait until we have 100 posts and then save them all in one insert, if possible
       @post_queue << post
-    end
 
-    # wait until we have 100 posts and then save them all in one insert, if possible
-    if @post_queue.length >= POSTS_BATCH_SIZE
-      save_queued_posts
-      save_cursor(@sky.cursor)
+      if @post_queue.length >= POSTS_BATCH_SIZE
+        save_queued_posts
+      end
+    elsif @save_posts == :matching && matched
+      # save immediately because matched posts might be rare; we've already checked validations
+      post.save!(validate: false)
     end
 
     print '.' if @show_progress && @log_posts != :all
