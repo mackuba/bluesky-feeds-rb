@@ -1,4 +1,4 @@
-<h1>Bluesky feeds in Ruby &nbsp;<img src="https://raw.githubusercontent.com/mackuba/bluesky-feeds-rb/ebbfc3056129a2c31bf030cb21e4b14a71dea3c9/images/ruby.png" width="26"></h1>
+<h1>Bluesky feeds in Ruby &nbsp;<img src="https://raw.githubusercontent.com/mackuba/bluesky-feeds-rb/refs/heads/master/images/ruby.png" width="26"></h1>
 
 This repo is an example or template that you can use to create a "feed generator" service for the Bluesky social network which hosts custom feeds. It's a reimplementation of the official TypeScript [feed-generator](https://github.com/bluesky-social/feed-generator) example in Ruby.
 
