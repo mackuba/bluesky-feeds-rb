@@ -83,9 +83,9 @@ As an optional thing, the [`app/server.rb`](app/server.rb) file includes some sl
 
 ## Setting up
 
-This app should run on any somewhat recent version of Ruby, but of course it's recommended to run one that's still maintained, ideally the latest one. It's also recommended to install it with [YJIT support](https://www.leemeichin.com/posts/ruby-32-jit.html), and on Linux also with [jemalloc](https://scalingo.com/blog/improve-ruby-application-memory-jemalloc).
+This app should run on any somewhat recent version of Ruby, though of course it's recommended to run one that's still getting maintenance updates, ideally the latest one. It's also recommended to install it with [YJIT support](https://shopify.engineering/ruby-yjit-is-production-ready), and on Linux also with [jemalloc](https://scalingo.com/blog/improve-ruby-application-memory-jemalloc). You will probably need to have some familiarity with the Ruby ecosystem in order to set it up and run it.
 
-First, you need to install the dependencies of course:
+First, you need to install the dependencies:
 
 ```
 bundle install
@@ -220,7 +220,7 @@ bundle exec rake delete_feed_item URL=https://bsky.app/profile/example.com/post/
 
 ## Credits
 
-Copyright © 2025 Kuba Suder ([@mackuba.eu](https://bsky.app/profile/mackuba.eu)).
+Copyright © 2025 Kuba Suder ([@mackuba.eu](https://bsky.app/profile/did:plc:oio4hkxaop4ao4wz2pp3f4cr)).
 
 The code is available under the terms of the [zlib license](https://choosealicense.com/licenses/zlib/) (permissive, similar to MIT).
 
